@@ -2,7 +2,6 @@ package com.ivan.compshop.ui.auth
 
 import android.content.Intent
 import android.os.Bundle
-import android.view.View
 import android.widget.Toast
 import androidx.appcompat.app.AppCompatActivity
 import androidx.lifecycle.lifecycleScope
@@ -23,7 +22,6 @@ class LoginActivity : AppCompatActivity() {
 
         authRepository = (application as CompShopApplication).authRepository
 
-        // Ако веќе е логиран, оди на Home
         if (authRepository.isLoggedIn) {
             goToHome()
             return
@@ -33,8 +31,6 @@ class LoginActivity : AppCompatActivity() {
     }
 
     private fun setupClickListeners() {
-
-        // Login со Email
         binding.btnLogin.setOnClickListener {
             val email = binding.etEmail.text.toString().trim()
             val password = binding.etPassword.text.toString().trim()
@@ -55,7 +51,6 @@ class LoginActivity : AppCompatActivity() {
             }
         }
 
-        // Anonymous Login
         binding.btnAnonymous.setOnClickListener {
             showLoading(true)
             lifecycleScope.launch {
@@ -68,7 +63,6 @@ class LoginActivity : AppCompatActivity() {
             }
         }
 
-        // Оди на Register
         binding.tvRegister.setOnClickListener {
             startActivity(Intent(this, RegisterActivity::class.java))
         }

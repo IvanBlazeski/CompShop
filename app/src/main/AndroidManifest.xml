@@ -52,6 +52,14 @@
             android:name=".ui.detail.DetailActivity"
             android:exported="false"/>
 
+        <service
+            android:name=".CompShopMessagingService"
+            android:exported="false">
+            <intent-filter>
+                <action android:name="com.google.firebase.MESSAGING_EVENT"/>
+            </intent-filter>
+        </service>
+
     </application>
 
 </manifest>
