@@ -12,7 +12,20 @@
           "package_name": "com.ivan.compshop"
         }
       },
-      "oauth_client": [],
+      "oauth_client": [
+        {
+          "client_id": "798008436575-t2sgaa0rci08pcm8drmi8i4jl05n2kgq.apps.googleusercontent.com",
+          "client_type": 1,
+          "android_info": {
+            "package_name": "com.ivan.compshop",
+            "certificate_hash": "8ac5e94cd11d2a39cbba311eda0bf02c60ae6f27"
+          }
+        },
+        {
+          "client_id": "798008436575-03q59p6v884orp3ftlu7m3dpnk0do725.apps.googleusercontent.com",
+          "client_type": 3
+        }
+      ],
       "api_key": [
         {
           "current_key": "AIzaSyAk5OuiF1JRA1v3HoDCYldRN4ZoU1vUk4M"
@@ -20,7 +33,12 @@
       ],
       "services": {
         "appinvite_service": {
-          "other_platform_oauth_client": []
+          "other_platform_oauth_client": [
+            {
+              "client_id": "798008436575-03q59p6v884orp3ftlu7m3dpnk0do725.apps.googleusercontent.com",
+              "client_type": 3
+            }
+          ]
         }
       }
     }
