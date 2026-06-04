@@ -3,21 +3,6 @@
     xmlns:tools="http://schemas.android.com/tools">
 
     <uses-permission android:name="android.permission.INTERNET" />
-    <activity
-        android:name=".ui.cart.CartActivity"
-        android:exported="false"/>
-
-    <activity
-        android:name=".ui.orders.OrdersActivity"
-        android:exported="false"/>
-
-    <activity
-        android:name=".ui.profile.ProfileActivity"
-        android:exported="false"/>
-
-    <activity
-        android:name=".ui.detail.DetailActivity"
-        android:exported="false"/>
 
     <application
         android:name=".CompShopApplication"
@@ -49,6 +34,22 @@
 
         <activity
             android:name=".MainActivity"
+            android:exported="false"/>
+
+        <activity
+            android:name=".ui.cart.CartActivity"
+            android:exported="false"/>
+
+        <activity
+            android:name=".ui.orders.OrdersActivity"
+            android:exported="false"/>
+
+        <activity
+            android:name=".ui.profile.ProfileActivity"
+            android:exported="false"/>
+
+        <activity
+            android:name=".ui.detail.DetailActivity"
             android:exported="false"/>
 
     </application>
