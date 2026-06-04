@@ -52,7 +52,8 @@ class HomeActivity : AppCompatActivity() {
                 addToCart(computer)
             }
         )
-        binding.rvComputers.layoutManager = GridLayoutManager(this, 2)
+        val spanCount = if (resources.getBoolean(com.ivan.compshop.R.bool.isTablet)) 3 else 2
+        binding.rvComputers.layoutManager = GridLayoutManager(this, spanCount)
         binding.rvComputers.adapter = adapter
     }
 
