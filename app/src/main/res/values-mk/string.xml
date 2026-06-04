@@ -1,0 +1,81 @@
+<resources>
+    <!-- App -->
+    <string name="app_name">CompShop</string>
+
+    <!-- Auth -->
+    <string name="login">Најава</string>
+    <string name="register">Регистрација</string>
+    <string name="email">Е-пошта</string>
+    <string name="password">Лозинка</string>
+    <string name="forgot_password">Заборавена лозинка?</string>
+    <string name="no_account">Немате акаунт? Регистрирајте се</string>
+    <string name="have_account">Веќе имате акаунт? Најавете се</string>
+    <string name="continue_google">Продолжи со Google</string>
+    <string name="continue_facebook">Продолжи со Facebook</string>
+    <string name="continue_anonymous">Продолжи како гостин</string>
+
+    <!-- Home -->
+    <string name="home">Почетна</string>
+    <string name="search">Пребарување</string>
+    <string name="search_hint">Пребарај компјутери...</string>
+    <string name="filter">Филтер</string>
+    <string name="all_categories">Сите категории</string>
+    <string name="sort_by">Сортирај по</string>
+    <string name="price_low_high">Цена: Од ниска кон висока</string>
+    <string name="price_high_low">Цена: Од висока кон ниска</string>
+
+    <!-- Computer -->
+    <string name="price">Цена</string>
+    <string name="brand">Бренд</string>
+    <string name="model">Модел</string>
+    <string name="processor">Процесор</string>
+    <string name="ram">RAM меморија</string>
+    <string name="storage">Складирање</string>
+    <string name="graphics">Графичка картичка</string>
+    <string name="add_to_cart">Додај во кошничка</string>
+    <string name="details">Детали</string>
+    <string name="specifications">Спецификации</string>
+    <string name="in_stock">На залиха</string>
+    <string name="out_of_stock">Нема на залиха</string>
+
+    <!-- Cart -->
+    <string name="cart">Кошничка</string>
+    <string name="cart_empty">Вашата кошничка е празна</string>
+    <string name="total">Вкупно</string>
+    <string name="checkout">Нарачај</string>
+    <string name="remove">Отстрани</string>
+    <string name="quantity">Количина</string>
+
+    <!-- Orders -->
+    <string name="orders">Нарачки</string>
+    <string name="order_history">Историја на нарачки</string>
+    <string name="order_number">Нарачка #</string>
+    <string name="order_date">Датум</string>
+    <string name="order_status">Статус</string>
+    <string name="order_pending">Во обработка</string>
+    <string name="order_confirmed">Потврдена</string>
+    <string name="order_delivered">Доставена</string>
+
+    <!-- Profile -->
+    <string name="profile">Профил</string>
+    <string name="edit_profile">Уреди профил</string>
+    <string name="logout">Одјава</string>
+    <string name="full_name">Име и презиме</string>
+    <string name="phone">Телефон</string>
+    <string name="address">Адреса</string>
+    <string name="save">Зачувај</string>
+    <string name="cancel">Откажи</string>
+
+    <!-- Navigation -->
+    <string name="nav_home">Почетна</string>
+    <string name="nav_cart">Кошничка</string>
+    <string name="nav_orders">Нарачки</string>
+    <string name="nav_profile">Профил</string>
+
+    <!-- Messages -->
+    <string name="loading">Вчитување...</string>
+    <string name="error_occurred">Настана грешка</string>
+    <string name="no_results">Нема резултати</string>
+    <string name="added_to_cart">Додадено во кошничка!</string>
+    <string name="order_placed">Нарачката е успешно поставена!</string>
+</resources>

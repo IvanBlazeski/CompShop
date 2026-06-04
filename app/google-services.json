@@ -1,0 +1,29 @@
+{
+  "project_info": {
+    "project_number": "798008436575",
+    "project_id": "compshop-6d462",
+    "storage_bucket": "compshop-6d462.firebasestorage.app"
+  },
+  "client": [
+    {
+      "client_info": {
+        "mobilesdk_app_id": "1:798008436575:android:d726fe1ccc0046477738ea",
+        "android_client_info": {
+          "package_name": "com.ivan.compshop"
+        }
+      },
+      "oauth_client": [],
+      "api_key": [
+        {
+          "current_key": "AIzaSyAk5OuiF1JRA1v3HoDCYldRN4ZoU1vUk4M"
+        }
+      ],
+      "services": {
+        "appinvite_service": {
+          "other_platform_oauth_client": []
+        }
+      }
+    }
+  ],
+  "configuration_version": "1"
+}
