@@ -42,7 +42,7 @@ class HomeActivity : AppCompatActivity() {
         setupCartHeader()
         setupFilterButton()
         loadComputers()
-        observeCartCount()
+        observeNotificationCount()
     }
 
     override fun onResume() {
@@ -152,18 +152,28 @@ class HomeActivity : AppCompatActivity() {
         binding.bottomNavigation.selectedItemId = R.id.nav_home
     }
 
-    private fun observeCartCount() {
-        lifecycleScope.launch {
-            app.cartRepository.getCartCount().collectLatest { count ->
+    private fun observeNotificationCount() {
+        val userId = com.google.firebase.auth.FirebaseAuth.getInstance().currentUser?.let {
+            if (!it.email.isNullOrEmpty()) it.email else it.uid
+        } ?: return
+
+        com.google.firebase.firestore.FirebaseFirestore.getInstance()
+            .collection("users")
+            .document(userId)
+            .collection("notifications")
+            .addSnapshotListener { snapshot, _ ->
+                val unreadCount = snapshot?.documents?.count {
+                    it.getBoolean("isRead") == false
+                } ?: 0
+
                 val badge = findViewById<android.widget.TextView>(R.id.tvNotificationBadge)
-                if (count > 0) {
+                if (unreadCount > 0) {
                     badge?.visibility = android.view.View.VISIBLE
-                    badge?.text = count.toString()
+                    badge?.text = unreadCount.toString()
                 } else {
                     badge?.visibility = android.view.View.GONE
                 }
             }
-        }
     }
 
     private fun loadComputers() {
