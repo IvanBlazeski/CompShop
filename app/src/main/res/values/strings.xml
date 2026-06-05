@@ -13,6 +13,9 @@
     <string name="continue_google">Continue with Google</string>
     <string name="continue_facebook">Continue with Facebook</string>
     <string name="continue_anonymous">Continue as Guest</string>
+    <string name="facebook_app_id">4428569700759072</string>
+    <string name="fb_login_protocol_scheme">fb4428569700759072</string>
+    <string name="facebook_client_token">284390a4c6cbb93b9288f6c589b713f0</string>
 
     <!-- Home -->
     <string name="home">Home</string>

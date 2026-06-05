@@ -32,7 +32,13 @@ class ProfileActivity : AppCompatActivity() {
 
     private fun loadProfile() {
         val user = auth.currentUser
-        binding.tvEmail.text = user?.email ?: "Guest"
+        val displayName = user?.displayName
+        val email = user?.email
+        binding.tvEmail.text = when {
+            email != null -> email
+            displayName != null -> displayName
+            else -> "Facebook User"
+        }
 
         user?.uid?.let { uid ->
             lifecycleScope.launch {
