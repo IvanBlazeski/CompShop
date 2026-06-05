@@ -40,8 +40,15 @@ class LoginActivity : AppCompatActivity() {
                 lifecycleScope.launch {
                     val authResult = authRepository.loginWithGoogle(token)
                     authResult.fold(
-                        onSuccess = { goToHome() },
-                        onFailure = { Toast.makeText(this@LoginActivity, it.message, Toast.LENGTH_SHORT).show() }
+                        onSuccess = { user ->
+                            lifecycleScope.launch {
+                                authRepository.saveUserToFirestore(user)
+                            }
+                            goToHome()
+                        },
+                        onFailure = {
+                            Toast.makeText(this@LoginActivity, it.message, Toast.LENGTH_SHORT).show()
+                        }
                     )
                 }
             }
@@ -75,7 +82,16 @@ class LoginActivity : AppCompatActivity() {
                     lifecycleScope.launch {
                         try {
                             auth.signOut()
-                            auth.signInWithCredential(credential).await()
+                            val firebaseResult = auth.signInWithCredential(credential).await()
+                            firebaseResult.user?.let { user ->
+                                // Ако Facebook нема email, користи displayName или uid
+                                val userWithEmail = object {
+                                    val uid = user.uid
+                                    val email = user.email
+                                    val displayName = user.displayName ?: "Facebook User"
+                                }
+                                authRepository.saveUserToFirestore(user)
+                            }
                             goToHome()
                         } catch (e: Exception) {
                             Toast.makeText(this@LoginActivity, e.message, Toast.LENGTH_SHORT).show()
@@ -104,8 +120,13 @@ class LoginActivity : AppCompatActivity() {
                 val result = authRepository.loginWithEmail(email, password)
                 showLoading(false)
                 result.fold(
-                    onSuccess = { goToHome() },
-                    onFailure = { Toast.makeText(this@LoginActivity, it.message, Toast.LENGTH_SHORT).show() }
+                    onSuccess = { user ->
+                        authRepository.saveUserToFirestore(user)
+                        goToHome()
+                    },
+                    onFailure = {
+                        Toast.makeText(this@LoginActivity, it.message, Toast.LENGTH_SHORT).show()
+                    }
                 )
             }
         }
@@ -134,7 +155,9 @@ class LoginActivity : AppCompatActivity() {
                 showLoading(false)
                 result.fold(
                     onSuccess = { goToHome() },
-                    onFailure = { Toast.makeText(this@LoginActivity, it.message, Toast.LENGTH_SHORT).show() }
+                    onFailure = {
+                        Toast.makeText(this@LoginActivity, it.message, Toast.LENGTH_SHORT).show()
+                    }
                 )
             }
         }

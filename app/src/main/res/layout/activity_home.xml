@@ -42,9 +42,9 @@
 
         </LinearLayout>
 
-        <!-- Cart Icon with Badge -->
+        <!-- Notification Icon with Badge -->
         <FrameLayout
-            android:id="@+id/btnCartHeader"
+            android:id="@+id/btnNotification"
             android:layout_width="44dp"
             android:layout_height="44dp"
             android:background="@drawable/btn_social_neon"
@@ -55,11 +55,11 @@
                 android:layout_width="24dp"
                 android:layout_height="24dp"
                 android:layout_gravity="center"
-                android:src="@drawable/ic_cart"
+                android:src="@drawable/ic_notification"
                 app:tint="#00D4FF"/>
 
             <TextView
-                android:id="@+id/tvCartBadge"
+                android:id="@+id/tvNotificationBadge"
                 android:layout_width="18dp"
                 android:layout_height="18dp"
                 android:layout_gravity="top|end"
@@ -68,8 +68,7 @@
                 android:textColor="#FFFFFF"
                 android:textSize="10sp"
                 android:textStyle="bold"
-                android:visibility="gone"
-                android:text="0"/>
+                android:text="4"/>
 
         </FrameLayout>
 

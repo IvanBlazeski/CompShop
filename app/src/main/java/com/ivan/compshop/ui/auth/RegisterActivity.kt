@@ -21,12 +21,10 @@ class RegisterActivity : AppCompatActivity() {
         setContentView(binding.root)
 
         authRepository = (application as CompShopApplication).authRepository
-
         setupClickListeners()
     }
 
     private fun setupClickListeners() {
-
         binding.btnRegister.setOnClickListener {
             val fullName = binding.etFullName.text.toString().trim()
             val email = binding.etEmail.text.toString().trim()
@@ -45,8 +43,13 @@ class RegisterActivity : AppCompatActivity() {
             lifecycleScope.launch {
                 val result = authRepository.registerWithEmail(email, password)
                 result.fold(
-                    onSuccess = {
-                        Toast.makeText(this@RegisterActivity, "Регистрацијата е успешна!", Toast.LENGTH_SHORT).show()
+                    onSuccess = { user ->
+                        authRepository.saveUserToFirestore(user)
+                        Toast.makeText(
+                            this@RegisterActivity,
+                            "Регистрацијата е успешна!",
+                            Toast.LENGTH_SHORT
+                        ).show()
                         startActivity(Intent(this@RegisterActivity, HomeActivity::class.java))
                         finish()
                     },

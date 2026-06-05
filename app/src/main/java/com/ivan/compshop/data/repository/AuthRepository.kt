@@ -52,6 +52,36 @@ class AuthRepository {
         }
     }
 
+    suspend fun saveUserToFirestore(user: FirebaseUser) {
+        try {
+            val firestore = com.google.firebase.firestore.FirebaseFirestore.getInstance()
+            val email = user.email
+            val displayName = user.displayName ?: "User"
+
+            val userData = hashMapOf(
+                "uid" to user.uid,
+                "email" to (email ?: ""),
+                "displayName" to displayName,
+                "createdAt" to com.google.firebase.Timestamp.now()
+            )
+
+            // Приоритет: email → displayName → uid
+            val documentId = when {
+                !email.isNullOrEmpty() -> email
+                displayName != "User" -> "${displayName.replace(" ", "_")}_${user.uid.take(6)}"
+                else -> user.uid
+            }
+
+            firestore.collection("users")
+                .document(documentId)
+                .set(userData, com.google.firebase.firestore.SetOptions.merge())
+                .await()
+
+        } catch (e: Exception) {
+            // Ignore
+        }
+    }
+
     fun logout() {
         auth.signOut()
     }

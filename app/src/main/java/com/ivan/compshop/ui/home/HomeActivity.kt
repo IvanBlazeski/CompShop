@@ -102,8 +102,9 @@ class HomeActivity : AppCompatActivity() {
     }
 
     private fun setupCartHeader() {
-        findViewById<android.widget.FrameLayout>(R.id.btnCartHeader)?.setOnClickListener {
-            startActivity(Intent(this, CartActivity::class.java))
+        findViewById<android.widget.FrameLayout>(R.id.btnNotification)?.setOnClickListener {
+            val notificationsSheet = com.ivan.compshop.ui.notifications.NotificationsBottomSheet()
+            notificationsSheet.show(supportFragmentManager, "NotificationsBottomSheet")
         }
     }
 
@@ -154,7 +155,7 @@ class HomeActivity : AppCompatActivity() {
     private fun observeCartCount() {
         lifecycleScope.launch {
             app.cartRepository.getCartCount().collectLatest { count ->
-                val badge = findViewById<TextView>(R.id.tvCartBadge)
+                val badge = findViewById<android.widget.TextView>(R.id.tvNotificationBadge)
                 if (count > 0) {
                     badge?.visibility = android.view.View.VISIBLE
                     badge?.text = count.toString()
