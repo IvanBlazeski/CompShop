@@ -9,15 +9,15 @@ import com.google.android.material.bottomsheet.BottomSheetDialogFragment
 import com.ivan.compshop.R
 
 class FilterBottomSheetFragment(
-    private val selectedProcessor: String,
-    private val selectedPriceRange: String,
-    private val selectedSort: String,
-    private val onApply: (processor: String, priceRange: String, sort: String) -> Unit
+    private val selectedProcessors: Set<String>,
+    private val selectedPriceRanges: Set<String>,
+    private val selectedSorts: Set<String>,
+    private val onApply: (processors: Set<String>, priceRanges: Set<String>, sorts: Set<String>) -> Unit
 ) : BottomSheetDialogFragment() {
 
-    private var currentProcessor = selectedProcessor
-    private var currentPriceRange = selectedPriceRange
-    private var currentSort = selectedSort
+    private val currentProcessors = selectedProcessors.toMutableSet()
+    private val currentPriceRanges = selectedPriceRanges.toMutableSet()
+    private val currentSorts = selectedSorts.toMutableSet()
 
     override fun onCreateView(
         inflater: LayoutInflater,
@@ -29,7 +29,6 @@ class FilterBottomSheetFragment(
 
     override fun onViewCreated(view: View, savedInstanceState: Bundle?) {
         super.onViewCreated(view, savedInstanceState)
-
         setupProcessorFilters(view)
         setupPriceFilters(view)
         setupSortFilters(view)
@@ -45,10 +44,24 @@ class FilterBottomSheetFragment(
             view.findViewById<TextView>(R.id.procM3) to "Apple M3"
         )
         processors.forEach { (tv, value) ->
-            updateFilterStyle(tv, value == currentProcessor)
-            tv.setOnClickListener {
-                currentProcessor = value
-                processors.forEach { (t, v) -> updateFilterStyle(t, v == value) }
+            updateFilterStyle(tv, currentProcessors.contains(value))
+            tv?.setOnClickListener {
+                if (value == "All") {
+                    currentProcessors.clear()
+                    currentProcessors.add("All")
+                    processors.forEach { (t, v) -> updateFilterStyle(t, v == "All") }
+                } else {
+                    currentProcessors.remove("All")
+                    if (currentProcessors.contains(value)) {
+                        currentProcessors.remove(value)
+                        if (currentProcessors.isEmpty()) currentProcessors.add("All")
+                    } else {
+                        currentProcessors.add(value)
+                    }
+                    processors.forEach { (t, v) ->
+                        updateFilterStyle(t, currentProcessors.contains(v))
+                    }
+                }
             }
         }
     }
@@ -61,10 +74,24 @@ class FilterBottomSheetFragment(
             view.findViewById<TextView>(R.id.priceOver1500) to "Over $1500"
         )
         prices.forEach { (tv, value) ->
-            updateFilterStyle(tv, value == currentPriceRange)
-            tv.setOnClickListener {
-                currentPriceRange = value
-                prices.forEach { (t, v) -> updateFilterStyle(t, v == value) }
+            updateFilterStyle(tv, currentPriceRanges.contains(value))
+            tv?.setOnClickListener {
+                if (value == "All") {
+                    currentPriceRanges.clear()
+                    currentPriceRanges.add("All")
+                    prices.forEach { (t, v) -> updateFilterStyle(t, v == "All") }
+                } else {
+                    currentPriceRanges.remove("All")
+                    if (currentPriceRanges.contains(value)) {
+                        currentPriceRanges.remove(value)
+                        if (currentPriceRanges.isEmpty()) currentPriceRanges.add("All")
+                    } else {
+                        currentPriceRanges.add(value)
+                    }
+                    prices.forEach { (t, v) ->
+                        updateFilterStyle(t, currentPriceRanges.contains(v))
+                    }
+                }
             }
         }
     }
@@ -76,36 +103,33 @@ class FilterBottomSheetFragment(
             view.findViewById<TextView>(R.id.sortHighest) to "Highest price"
         )
         sorts.forEach { (tv, value) ->
-            updateFilterStyle(tv, value == currentSort)
-            tv.setOnClickListener {
-                currentSort = value
+            updateFilterStyle(tv, currentSorts.contains(value))
+            tv?.setOnClickListener {
+                currentSorts.clear()
+                currentSorts.add(value)
                 sorts.forEach { (t, v) -> updateFilterStyle(t, v == value) }
             }
         }
     }
 
     private fun setupButtons(view: View) {
-        view.findViewById<TextView>(R.id.btnClear).setOnClickListener {
-            currentProcessor = "All"
-            currentPriceRange = "All"
-            currentSort = "Default"
-            onApply("All", "All", "Default")
+        view.findViewById<TextView>(R.id.btnClear)?.setOnClickListener {
+            onApply(setOf("All"), setOf("All"), setOf("Default"))
             dismiss()
         }
-
-        view.findViewById<TextView>(R.id.btnApply).setOnClickListener {
-            onApply(currentProcessor, currentPriceRange, currentSort)
+        view.findViewById<TextView>(R.id.btnApply)?.setOnClickListener {
+            onApply(currentProcessors, currentPriceRanges, currentSorts)
             dismiss()
         }
     }
 
-    private fun updateFilterStyle(tv: TextView, isSelected: Boolean) {
+    private fun updateFilterStyle(tv: TextView?, isSelected: Boolean) {
         if (isSelected) {
-            tv.setBackgroundResource(R.drawable.btn_neon_gradient)
-            tv.setTextColor(android.graphics.Color.WHITE)
+            tv?.setBackgroundResource(R.drawable.btn_neon_gradient)
+            tv?.setTextColor(android.graphics.Color.WHITE)
         } else {
-            tv.setBackgroundResource(R.drawable.btn_social_neon)
-            tv.setTextColor(android.graphics.Color.parseColor("#00D4FF"))
+            tv?.setBackgroundResource(R.drawable.btn_social_neon)
+            tv?.setTextColor(android.graphics.Color.parseColor("#00D4FF"))
         }
     }
 }

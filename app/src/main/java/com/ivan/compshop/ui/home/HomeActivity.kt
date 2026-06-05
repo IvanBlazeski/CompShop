@@ -26,9 +26,9 @@ class HomeActivity : AppCompatActivity() {
     private val app by lazy { application as CompShopApplication }
     private var allComputers = listOf<Computer>()
     private var selectedBrand = "All"
-    private var selectedProcessor = "All"
-    private var selectedPriceRange = "All"
-    private var selectedSort = "Default"
+    private var selectedProcessors = mutableSetOf("All")
+    private var selectedPriceRanges = mutableSetOf("All")
+    private var selectedSorts = mutableSetOf("Default")
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
@@ -111,13 +111,13 @@ class HomeActivity : AppCompatActivity() {
 
     private fun showFilterBottomSheet() {
         val bottomSheet = FilterBottomSheetFragment(
-            selectedProcessor = selectedProcessor,
-            selectedPriceRange = selectedPriceRange,
-            selectedSort = selectedSort,
-            onApply = { processor, priceRange, sort ->
-                selectedProcessor = processor
-                selectedPriceRange = priceRange
-                selectedSort = sort
+            selectedProcessors = selectedProcessors,
+            selectedPriceRanges = selectedPriceRanges,
+            selectedSorts = selectedSorts,
+            onApply = { processors, priceRanges, sorts ->
+                selectedProcessors = processors.toMutableSet()
+                selectedPriceRanges = priceRanges.toMutableSet()
+                selectedSorts = sorts.toMutableSet()
                 val query = findViewById<android.widget.EditText>(R.id.etSearch)?.text.toString() ?: ""
                 applyFilters(query)
             }
@@ -189,20 +189,28 @@ class HomeActivity : AppCompatActivity() {
             }
         }
 
-        if (selectedProcessor != "All") {
-            filtered = filtered.filter {
-                it.processor.contains(selectedProcessor, ignoreCase = true)
+        if (!selectedProcessors.contains("All")) {
+            filtered = filtered.filter { computer ->
+                selectedProcessors.any { proc ->
+                    computer.processor.contains(proc, ignoreCase = true)
+                }
             }
         }
 
-        filtered = when (selectedPriceRange) {
-            "Under $1000" -> filtered.filter { it.price < 1000 }
-            "$1000 - $1500" -> filtered.filter { it.price in 1000.0..1500.0 }
-            "Over $1500" -> filtered.filter { it.price > 1500 }
-            else -> filtered
+        val priceFiltered = mutableListOf<Computer>()
+        if (selectedPriceRanges.contains("All")) {
+            priceFiltered.addAll(filtered)
+        } else {
+            if (selectedPriceRanges.contains("Under $1000"))
+                priceFiltered.addAll(filtered.filter { it.price < 1000 })
+            if (selectedPriceRanges.contains("$1000 - $1500"))
+                priceFiltered.addAll(filtered.filter { it.price in 1000.0..1500.0 })
+            if (selectedPriceRanges.contains("Over $1500"))
+                priceFiltered.addAll(filtered.filter { it.price > 1500 })
         }
+        filtered = priceFiltered.distinctBy { it.id }
 
-        filtered = when (selectedSort) {
+        filtered = when (selectedSorts.firstOrNull()) {
             "Lowest price" -> filtered.sortedBy { it.price }
             "Highest price" -> filtered.sortedByDescending { it.price }
             else -> filtered
