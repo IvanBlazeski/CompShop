@@ -1,86 +1,119 @@
 <?xml version="1.0" encoding="utf-8"?>
-<com.google.android.material.card.MaterialCardView
+<LinearLayout
     xmlns:android="http://schemas.android.com/apk/res/android"
     xmlns:app="http://schemas.android.com/apk/res-auto"
     android:layout_width="match_parent"
     android:layout_height="wrap_content"
+    android:orientation="vertical"
+    android:background="@drawable/card_product_neon"
     android:layout_margin="8dp"
-    app:cardCornerRadius="12dp"
-    app:cardElevation="4dp">
+    android:padding="12dp">
 
-    <LinearLayout
+    <!-- Image Container with Favorite -->
+    <FrameLayout
         android:layout_width="match_parent"
-        android:layout_height="wrap_content"
-        android:orientation="vertical"
-        android:padding="12dp">
+        android:layout_height="140dp"
+        android:layout_marginBottom="10dp">
 
-        <!-- Слика -->
-        <ImageView
-            android:id="@+id/ivComputer"
-            android:layout_width="match_parent"
-            android:layout_height="180dp"
-            android:scaleType="centerCrop"
-            android:src="@android:drawable/ic_menu_gallery"
-            android:layout_marginBottom="8dp"/>
-
-        <!-- Бренд -->
-        <TextView
-            android:id="@+id/tvBrand"
-            android:layout_width="wrap_content"
-            android:layout_height="wrap_content"
-            android:text="Brand"
-            android:textColor="#1565C0"
-            android:textSize="12sp"
-            android:textStyle="bold"/>
-
-        <!-- Модел -->
-        <TextView
-            android:id="@+id/tvModel"
-            android:layout_width="wrap_content"
-            android:layout_height="wrap_content"
-            android:text="Model"
-            android:textSize="16sp"
-            android:textStyle="bold"
-            android:textColor="#212121"
-            android:layout_marginBottom="4dp"/>
-
-        <!-- Процесор -->
-        <TextView
-            android:id="@+id/tvProcessor"
-            android:layout_width="wrap_content"
-            android:layout_height="wrap_content"
-            android:text="Processor"
-            android:textSize="13sp"
-            android:textColor="#666666"
-            android:layout_marginBottom="8dp"/>
-
-        <!-- Цена и копче -->
         <LinearLayout
             android:layout_width="match_parent"
-            android:layout_height="wrap_content"
-            android:orientation="horizontal"
-            android:gravity="center_vertical">
+            android:layout_height="match_parent"
+            android:background="@drawable/image_container"
+            android:gravity="center">
 
-            <TextView
-                android:id="@+id/tvPrice"
-                android:layout_width="0dp"
-                android:layout_height="wrap_content"
-                android:layout_weight="1"
-                android:text="$0.00"
-                android:textSize="18sp"
-                android:textStyle="bold"
-                android:textColor="#1565C0"/>
-
-            <com.google.android.material.button.MaterialButton
-                android:id="@+id/btnAddToCart"
-                android:layout_width="wrap_content"
-                android:layout_height="wrap_content"
-                android:text="@string/add_to_cart"
-                android:textSize="12sp"
-                android:backgroundTint="#1565C0"/>
+            <ImageView
+                android:id="@+id/ivComputer"
+                android:layout_width="match_parent"
+                android:layout_height="match_parent"
+                android:scaleType="fitCenter"
+                android:padding="8dp"
+                android:src="@android:drawable/ic_menu_gallery"/>
 
         </LinearLayout>
 
+        <!-- Favorite Icon -->
+        <ImageView
+            android:id="@+id/ivFavorite"
+            android:layout_width="32dp"
+            android:layout_height="32dp"
+            android:layout_gravity="top|end"
+            android:layout_margin="8dp"
+            android:src="@drawable/ic_favorite_border"
+            app:tint="#80FFFFFF"
+            android:background="@drawable/card_glass_neon"
+            android:padding="4dp"/>
+
+    </FrameLayout>
+
+    <!-- Brand -->
+    <TextView
+        android:id="@+id/tvBrand"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:text="Brand"
+        android:textColor="#00D4FF"
+        android:textSize="11sp"
+        android:textStyle="bold"
+        android:letterSpacing="0.08"
+        android:layout_marginBottom="2dp"/>
+
+    <!-- Model -->
+    <TextView
+        android:id="@+id/tvModel"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:text="Model"
+        android:textSize="13sp"
+        android:textStyle="bold"
+        android:textColor="#FFFFFF"
+        android:maxLines="1"
+        android:ellipsize="end"
+        android:layout_marginBottom="4dp"/>
+
+    <!-- Processor -->
+    <TextView
+        android:id="@+id/tvProcessor"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:text="Processor"
+        android:textSize="11sp"
+        android:textColor="#A6FFFFFF"
+        android:maxLines="1"
+        android:ellipsize="end"
+        android:layout_marginBottom="8dp"/>
+
+    <!-- Price + Button -->
+    <LinearLayout
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:orientation="horizontal"
+        android:gravity="center_vertical">
+
+        <TextView
+            android:id="@+id/tvPrice"
+            android:layout_width="0dp"
+            android:layout_height="wrap_content"
+            android:layout_weight="1"
+            android:text="$0.00"
+            android:textSize="14sp"
+            android:textStyle="bold"
+            android:textColor="#00E5FF"
+            android:maxLines="1"
+            android:ellipsize="end"/>
+
+        <Button
+            android:id="@+id/btnAddToCart"
+            android:layout_width="wrap_content"
+            android:layout_height="32dp"
+            android:text="Add"
+            android:textSize="11sp"
+            android:textStyle="bold"
+            android:textColor="#FFFFFF"
+            android:background="@drawable/btn_neon_gradient"
+            android:paddingStart="10dp"
+            android:paddingEnd="10dp"
+            android:stateListAnimator="@null"/>
+
     </LinearLayout>
 
-</com.google.android.material.card.MaterialCardView>
+</LinearLayout>
