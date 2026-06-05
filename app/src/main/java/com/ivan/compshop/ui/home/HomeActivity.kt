@@ -45,6 +45,10 @@ class HomeActivity : AppCompatActivity() {
         observeCartCount()
     }
 
+    override fun onResume() {
+        super.onResume()
+        binding.bottomNavigation.selectedItemId = R.id.nav_home
+    }
     private fun setupRecyclerView() {
         adapter = ComputerAdapter(
             onItemClick = { computer ->
