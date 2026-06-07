@@ -26,7 +26,13 @@ class CartRepository(database: AppDatabase) {
         )
         cartDao.insertItem(entity)
     }
+    suspend fun getAllItemsList(): List<CartItemEntity> {
+        return cartDao.getAllItemsList()
+    }
 
+    suspend fun getTotalPriceOnce(): Double {
+        return cartDao.getTotalPriceOnce() ?: 0.0
+    }
     suspend fun removeFromCart(cartItem: CartItemEntity) {
         cartDao.deleteItem(cartItem)
     }
