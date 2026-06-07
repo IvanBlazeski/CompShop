@@ -16,32 +16,62 @@ data class AppNotification(
     val title: String = "",
     val message: String = "",
     val time: String = "",
-    val isRead: Boolean = false
+    val isRead: Boolean = false,
+    val isGlobal: Boolean = false
 )
 
 class NotificationsBottomSheet : BottomSheetDialogFragment() {
 
     private val firestore = FirebaseFirestore.getInstance()
     private val auth = FirebaseAuth.getInstance()
+    private var personalNotifications = listOf<AppNotification>()
+    private var globalNotifications = listOf<AppNotification>()
 
-    override fun onCreateView(
-        inflater: LayoutInflater,
-        container: ViewGroup?,
-        savedInstanceState: Bundle?
-    ): View {
+    override fun onCreateView(inflater: LayoutInflater, container: ViewGroup?, savedInstanceState: Bundle?): View {
         return inflater.inflate(R.layout.fragment_notifications, container, false)
     }
 
     override fun onViewCreated(view: View, savedInstanceState: Bundle?) {
         super.onViewCreated(view, savedInstanceState)
-        loadNotifications(view)
+        loadPersonalNotifications(view)
+        loadGlobalNotifications(view)
     }
 
-    private fun loadNotifications(view: View) {
-        val container = view.findViewById<LinearLayout>(R.id.notificationsContainer)
-        val tvCount = view.findViewById<TextView>(R.id.tvNotificationCount)
-        val btnMarkAll = view.findViewById<TextView>(R.id.btnMarkAllRead)
+    private fun loadGlobalNotifications(view: View) {
+        val userId = auth.currentUser?.email ?: auth.currentUser?.uid ?: return
 
+        firestore.collection("globalNotifications")
+            .orderBy("createdAt", com.google.firebase.firestore.Query.Direction.DESCENDING)
+            .addSnapshotListener { snapshot, _ ->
+                if (snapshot == null) return@addSnapshotListener
+                firestore.collection("users")
+                    .document(userId)
+                    .collection("readGlobalNotifications")
+                    .get()
+                    .addOnSuccessListener { readSnapshot ->
+                        val readIds = readSnapshot.documents.map { it.id }.toSet()
+                        globalNotifications = snapshot.documents.mapNotNull { doc ->
+                            if (readIds.contains(doc.id)) return@mapNotNull null
+                            AppNotification(
+                                id = doc.id,
+                                title = doc.getString("title") ?: "",
+                                message = doc.getString("message") ?: "",
+                                time = doc.getTimestamp("createdAt")?.toDate()?.let {
+                                    android.text.format.DateUtils.getRelativeTimeSpanString(
+                                        it.time, System.currentTimeMillis(),
+                                        android.text.format.DateUtils.MINUTE_IN_MILLIS
+                                    ).toString()
+                                } ?: "",
+                                isRead = false,
+                                isGlobal = true
+                            )
+                        }
+                        updateUI(view)
+                    }
+            }
+    }
+
+    private fun loadPersonalNotifications(view: View) {
         val userId = auth.currentUser?.email ?: auth.currentUser?.uid ?: return
 
         firestore.collection("users")
@@ -50,64 +80,88 @@ class NotificationsBottomSheet : BottomSheetDialogFragment() {
             .orderBy("createdAt", com.google.firebase.firestore.Query.Direction.DESCENDING)
             .addSnapshotListener { snapshot, _ ->
                 if (snapshot == null) return@addSnapshotListener
-
-                val notifications = snapshot.documents.mapNotNull { doc ->
+                personalNotifications = snapshot.documents.mapNotNull { doc ->
                     AppNotification(
                         id = doc.id,
                         title = doc.getString("title") ?: "",
                         message = doc.getString("message") ?: "",
                         time = doc.getTimestamp("createdAt")?.toDate()?.let {
                             android.text.format.DateUtils.getRelativeTimeSpanString(
-                                it.time,
-                                System.currentTimeMillis(),
+                                it.time, System.currentTimeMillis(),
                                 android.text.format.DateUtils.MINUTE_IN_MILLIS
                             ).toString()
                         } ?: "",
-                        isRead = doc.getBoolean("isRead") ?: false
+                        isRead = doc.getBoolean("isRead") ?: false,
+                        isGlobal = false
                     )
                 }
-
-                val unreadCount = notifications.count { !it.isRead }
-                tvCount?.text = if (unreadCount > 0) "$unreadCount new" else "All read"
-
-                container?.removeAllViews()
-
-                if (notifications.isEmpty()) {
-                    val emptyView = TextView(requireContext()).apply {
-                        text = "No notifications yet"
-                        textSize = 14f
-                        setTextColor(android.graphics.Color.parseColor("#80FFFFFF"))
-                        gravity = android.view.Gravity.CENTER
-                        val params = LinearLayout.LayoutParams(
-                            LinearLayout.LayoutParams.MATCH_PARENT,
-                            LinearLayout.LayoutParams.WRAP_CONTENT
-                        )
-                        params.setMargins(0, 32, 0, 32)
-                        layoutParams = params
-                    }
-                    container?.addView(emptyView)
-                } else {
-                    notifications.forEach { notification ->
-                        val itemView = createNotificationItem(notification)
-                        container?.addView(itemView)
-                    }
-                }
-
-                btnMarkAll?.setOnClickListener {
-                    notifications.forEach { notif ->
-                        firestore.collection("users")
-                            .document(userId)
-                            .collection("notifications")
-                            .document(notif.id)
-                            .update("isRead", true)
-                    }
-                }
+                updateUI(view)
             }
+    }
+
+    private fun updateUI(view: View) {
+        if (!isAdded) return
+        val container = view.findViewById<LinearLayout>(R.id.notificationsContainer)
+        val tvCount = view.findViewById<TextView>(R.id.tvNotificationCount)
+        val btnMarkAll = view.findViewById<TextView>(R.id.btnMarkAllRead)
+        val userId = auth.currentUser?.email ?: auth.currentUser?.uid ?: return
+
+        val allNotifications = (globalNotifications + personalNotifications)
+        val unreadCount = personalNotifications.count { !it.isRead } + globalNotifications.size
+        tvCount?.text = if (unreadCount > 0) "$unreadCount new" else "All read"
+
+        container?.removeAllViews()
+
+        if (allNotifications.isEmpty()) {
+            val emptyView = TextView(requireContext()).apply {
+                text = "No notifications yet"
+                textSize = 14f
+                setTextColor(android.graphics.Color.parseColor("#80FFFFFF"))
+                gravity = android.view.Gravity.CENTER
+                val params = LinearLayout.LayoutParams(
+                    LinearLayout.LayoutParams.MATCH_PARENT,
+                    LinearLayout.LayoutParams.WRAP_CONTENT
+                )
+                params.setMargins(0, 32, 0, 32)
+                layoutParams = params
+            }
+            container?.addView(emptyView)
+        } else {
+            allNotifications.forEach { notification ->
+                container?.addView(createNotificationItem(notification))
+            }
+        }
+
+        btnMarkAll?.setOnClickListener {
+            val userId2 = auth.currentUser?.email ?: auth.currentUser?.uid ?: return@setOnClickListener
+
+            personalNotifications.forEach { notif ->
+                firestore.collection("users")
+                    .document(userId2)
+                    .collection("notifications")
+                    .document(notif.id)
+                    .update("isRead", true)
+            }
+
+            val batch = firestore.batch()
+            globalNotifications.forEach { notif ->
+                val ref = firestore.collection("users")
+                    .document(userId2)
+                    .collection("readGlobalNotifications")
+                    .document(notif.id)
+                batch.set(ref, mapOf("readAt" to com.google.firebase.firestore.FieldValue.serverTimestamp()))
+            }
+            batch.commit().addOnSuccessListener {
+                personalNotifications = personalNotifications.map { it.copy(isRead = true) }
+                globalNotifications = emptyList()
+                updateUI(view)
+                loadGlobalNotifications(view)
+            }
+        }
     }
 
     private fun createNotificationItem(notification: AppNotification): View {
         val context = requireContext()
-
         val item = LinearLayout(context).apply {
             orientation = LinearLayout.VERTICAL
             setBackgroundResource(R.drawable.btn_social_neon)
@@ -120,13 +174,20 @@ class NotificationsBottomSheet : BottomSheetDialogFragment() {
             layoutParams = params
         }
 
+        if (!notification.isRead) {
+            val dot = View(context).apply {
+                val params = LinearLayout.LayoutParams(16, 16)
+                params.setMargins(0, 0, 0, 8)
+                layoutParams = params
+                setBackgroundResource(R.drawable.btn_neon_gradient)
+            }
+            item.addView(dot)
+        }
+
         val tvTitle = TextView(context).apply {
             text = notification.title
             textSize = 14f
-            setTextColor(
-                if (!notification.isRead) android.graphics.Color.WHITE
-                else android.graphics.Color.parseColor("#80FFFFFF")
-            )
+            setTextColor(android.graphics.Color.WHITE)
             setTypeface(null, android.graphics.Typeface.BOLD)
             val params = LinearLayout.LayoutParams(
                 LinearLayout.LayoutParams.MATCH_PARENT,
@@ -149,20 +210,9 @@ class NotificationsBottomSheet : BottomSheetDialogFragment() {
         }
 
         val tvTime = TextView(context).apply {
-            text = notification.time
+            text = if (notification.isGlobal) "📢 ${notification.time}" else notification.time
             textSize = 11f
             setTextColor(android.graphics.Color.parseColor("#00D4FF"))
-        }
-
-        // Unread indicator
-        if (!notification.isRead) {
-            val dot = View(context).apply {
-                val params = LinearLayout.LayoutParams(16, 16)
-                params.setMargins(0, 0, 0, 8)
-                layoutParams = params
-                setBackgroundResource(R.drawable.btn_neon_gradient)
-            }
-            item.addView(dot)
         }
 
         item.addView(tvTitle)

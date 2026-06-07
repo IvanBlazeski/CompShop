@@ -152,28 +152,51 @@ class HomeActivity : AppCompatActivity() {
         binding.bottomNavigation.selectedItemId = R.id.nav_home
     }
 
+    private var personalUnreadCount = 0
+    private var globalUnreadCount = 0
+
     private fun observeNotificationCount() {
         val userId = com.google.firebase.auth.FirebaseAuth.getInstance().currentUser?.let {
             if (!it.email.isNullOrEmpty()) it.email else it.uid
         } ?: return
 
-        com.google.firebase.firestore.FirebaseFirestore.getInstance()
-            .collection("users")
+        val firestore = com.google.firebase.firestore.FirebaseFirestore.getInstance()
+
+        // Персонални непрочитани - real-time listener
+        firestore.collection("users")
             .document(userId)
             .collection("notifications")
             .addSnapshotListener { snapshot, _ ->
-                val unreadCount = snapshot?.documents?.count {
+                personalUnreadCount = snapshot?.documents?.count {
                     it.getBoolean("isRead") == false
                 } ?: 0
-
-                val badge = findViewById<android.widget.TextView>(R.id.tvNotificationBadge)
-                if (unreadCount > 0) {
-                    badge?.visibility = android.view.View.VISIBLE
-                    badge?.text = unreadCount.toString()
-                } else {
-                    badge?.visibility = android.view.View.GONE
-                }
+                updateBadge(personalUnreadCount + globalUnreadCount)
             }
+
+        // Глобални - real-time listener за и readGlobalNotifications
+        firestore.collection("globalNotifications")
+            .addSnapshotListener { globalSnapshot, _ ->
+                val globalIds = globalSnapshot?.documents?.map { it.id } ?: emptyList()
+
+                firestore.collection("users")
+                    .document(userId)
+                    .collection("readGlobalNotifications")
+                    .addSnapshotListener { readSnapshot, _ ->
+                        val readIds = readSnapshot?.documents?.map { it.id }?.toSet() ?: emptySet()
+                        globalUnreadCount = globalIds.count { !readIds.contains(it) }
+                        updateBadge(personalUnreadCount + globalUnreadCount)
+                    }
+            }
+    }
+
+    private fun updateBadge(count: Int) {
+        val badge = findViewById<android.widget.TextView>(R.id.tvNotificationBadge)
+        if (count > 0) {
+            badge?.visibility = android.view.View.VISIBLE
+            badge?.text = count.toString()
+        } else {
+            badge?.visibility = android.view.View.GONE
+        }
     }
 
     private fun loadComputers() {
