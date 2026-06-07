@@ -22,8 +22,9 @@ class CartActivity : AppCompatActivity() {
         binding = ActivityCartBinding.inflate(layoutInflater)
         setContentView(binding.root)
 
-        setSupportActionBar(binding.toolbar)
-        supportActionBar?.setDisplayHomeAsUpEnabled(true)
+        binding.btnBack.setOnClickListener {
+            onBackPressedDispatcher.onBackPressed()
+        }
 
         setupRecyclerView()
         observeCart()
@@ -34,7 +35,7 @@ class CartActivity : AppCompatActivity() {
         adapter = CartAdapter { item ->
             lifecycleScope.launch {
                 app.cartRepository.removeFromCart(item)
-                Toast.makeText(this@CartActivity, "Отстрането!", Toast.LENGTH_SHORT).show()
+                Toast.makeText(this@CartActivity, "Removed!", Toast.LENGTH_SHORT).show()
             }
         }
         binding.rvCart.layoutManager = LinearLayoutManager(this)
@@ -45,7 +46,6 @@ class CartActivity : AppCompatActivity() {
         lifecycleScope.launch {
             app.cartRepository.getAllItems().collectLatest { items ->
                 adapter.submitList(items)
-
                 if (items.isEmpty()) {
                     binding.tvEmpty.visibility = View.VISIBLE
                     binding.rvCart.visibility = View.GONE
@@ -72,10 +72,5 @@ class CartActivity : AppCompatActivity() {
                 app.cartRepository.clearCart()
             }
         }
-    }
-
-    override fun onSupportNavigateUp(): Boolean {
-        onBackPressedDispatcher.onBackPressed()
-        return true
     }
 }
