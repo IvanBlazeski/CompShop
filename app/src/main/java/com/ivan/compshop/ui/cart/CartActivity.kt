@@ -6,6 +6,9 @@ import android.widget.Toast
 import androidx.appcompat.app.AppCompatActivity
 import androidx.lifecycle.lifecycleScope
 import androidx.recyclerview.widget.LinearLayoutManager
+import com.google.firebase.auth.FirebaseAuth
+import com.google.firebase.firestore.FieldValue
+import com.google.firebase.firestore.FirebaseFirestore
 import com.ivan.compshop.CompShopApplication
 import com.ivan.compshop.databinding.ActivityCartBinding
 import kotlinx.coroutines.flow.collectLatest
@@ -16,6 +19,8 @@ class CartActivity : AppCompatActivity() {
     private lateinit var binding: ActivityCartBinding
     private lateinit var adapter: CartAdapter
     private val app by lazy { application as CompShopApplication }
+    private val firestore = FirebaseFirestore.getInstance()
+    private val auth = FirebaseAuth.getInstance()
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
@@ -67,73 +72,91 @@ class CartActivity : AppCompatActivity() {
 
     private fun setupCheckout() {
         binding.btnCheckout.setOnClickListener {
-            val userId = com.google.firebase.auth.FirebaseAuth.getInstance().currentUser?.let {
-                if (!it.email.isNullOrEmpty()) it.email else it.uid
-            } ?: return@setOnClickListener
-
             lifecycleScope.launch {
                 val items = app.cartRepository.getAllItemsList()
                 val total = app.cartRepository.getTotalPriceOnce()
 
-                val dialog = CheckoutDialog(total) { paymentMethod, deliveryMethod, finalTotal ->
-                    lifecycleScope.launch {
-                        // Зачувај нарачка
-                        val order = hashMapOf(
-                            "userId" to userId,
-                            "items" to items.map { item ->
-                                hashMapOf(
-                                    "computerId" to item.computerId,
-                                    "computerName" to item.computerName,
-                                    "computerBrand" to item.computerBrand,
-                                    "price" to item.price,
-                                    "quantity" to item.quantity
-                                )
-                            },
-                            "totalPrice" to finalTotal,
-                            "paymentMethod" to paymentMethod,
-                            "deliveryMethod" to deliveryMethod,
-                            "status" to "pending",
-                            "isPaid" to (paymentMethod == "Card"),
-                            "createdAt" to com.google.firebase.firestore.FieldValue.serverTimestamp()
-                        )
-
-                        com.google.firebase.firestore.FirebaseFirestore.getInstance()
-                            .collection("orders")
-                            .document(userId)
-                            .collection("userOrders")
-                            .add(order)
-                            .addOnSuccessListener { documentRef ->
-                                android.util.Log.d("CHECKOUT", "Order saved: ${documentRef.id}")
-                                // Нотификација
-                                com.google.firebase.firestore.FirebaseFirestore.getInstance()
-                                    .collection("users")
-                                    .document(userId)
-                                    .collection("notifications")
-                                    .add(hashMapOf(
-                                        "title" to "Order confirmed! 🎉",
-                                        "message" to "Your order of $${"%.2f".format(finalTotal)} via $paymentMethod is confirmed!",
-                                        "isRead" to false,
-                                        "createdAt" to com.google.firebase.firestore.FieldValue.serverTimestamp()
-                                    ))
-
-                                Toast.makeText(
-                                    this@CartActivity,
-                                    getString(com.ivan.compshop.R.string.order_placed),
-                                    Toast.LENGTH_SHORT
-                                ).show()
-
-                                lifecycleScope.launch {
-                                    app.cartRepository.clearCart()
-                                }
-                            }
-                            .addOnFailureListener { e ->
-                                android.util.Log.e("CHECKOUT", "Error saving order: ${e.message}")
-                                Toast.makeText(this@CartActivity, "Error: ${e.message}", Toast.LENGTH_SHORT).show()
-                            }
-                    }
+                val checkoutDialog = CheckoutDialog(total) { paymentMethod, deliveryMethod, finalTotal ->
+                    placeOrder(items, paymentMethod, deliveryMethod, finalTotal)
                 }
-                dialog.show(supportFragmentManager, "CheckoutDialog")
+                checkoutDialog.show(supportFragmentManager, "CheckoutDialog")
             }
         }
+    }
+
+    private fun placeOrder(
+        items: List<com.ivan.compshop.data.local.CartItemEntity>,
+        paymentMethod: String,
+        deliveryMethod: String,
+        finalTotal: Double
+    ) {
+        val userId = auth.currentUser?.let {
+            when {
+                !it.email.isNullOrEmpty() -> it.email!!
+                !it.displayName.isNullOrEmpty() -> it.displayName!!.replace(" ", "_") + "_" + it.uid.take(6)
+                else -> it.uid
+            }
+        } ?: return
+
+        val today = java.text.SimpleDateFormat("yyyy-MM-dd", java.util.Locale.getDefault())
+            .format(java.util.Date())
+
+        val status = if (paymentMethod == "Card") "paid" else "pending"
+
+        val order = hashMapOf(
+            "userId" to userId,
+            "userEmail" to userId,
+            "items" to items.map { item ->
+                hashMapOf(
+                    "computerId" to item.computerId,
+                    "computerName" to item.computerName,
+                    "computerBrand" to item.computerBrand,
+                    "price" to item.price,
+                    "quantity" to item.quantity
+                )
+            },
+            "totalPrice" to finalTotal,
+            "paymentMethod" to paymentMethod,
+            "deliveryMethod" to deliveryMethod,
+            "status" to status,
+            "isPaid" to (paymentMethod == "Card"),
+            "createdAt" to FieldValue.serverTimestamp()
+        )
+
+        firestore.collection("orders")
+            .document(today)
+            .collection(userId)
+            .add(order)
+            .addOnSuccessListener {
+                // Нотификација
+                val notifTitle = if (paymentMethod == "Card") "Payment confirmed! 💳✅" else "Order placed! 📦"
+                val notifMessage = if (paymentMethod == "Card")
+                    "Your payment of $${"%.2f".format(finalTotal)} was successful!"
+                else
+                    "Your order of $${"%.2f".format(finalTotal)} will be paid on delivery."
+
+                firestore.collection("users")
+                    .document(userId)
+                    .collection("notifications")
+                    .add(hashMapOf(
+                        "title" to notifTitle,
+                        "message" to notifMessage,
+                        "isRead" to false,
+                        "createdAt" to FieldValue.serverTimestamp()
+                    ))
+
+                Toast.makeText(
+                    this@CartActivity,
+                    getString(com.ivan.compshop.R.string.order_placed),
+                    Toast.LENGTH_SHORT
+                ).show()
+
+                lifecycleScope.launch {
+                    app.cartRepository.clearCart()
+                }
+            }
+            .addOnFailureListener { e ->
+                Toast.makeText(this@CartActivity, "Error: ${e.message}", Toast.LENGTH_SHORT).show()
+            }
     }
 }
