@@ -55,11 +55,11 @@ class OrdersAdapter : ListAdapter<OrderItem, OrdersAdapter.OrderViewHolder>(Diff
             )
 
             val currentStep = when (order.trackingStatus) {
-                "order_placed" -> 0
-                "processing" -> 1
+                "placed" -> 0
+                "process" -> 1
                 "shipped" -> 2
-                "out_for_delivery" -> 3
-                "delivered" -> 4
+                "delivery" -> 3
+                "done" -> 4
                 else -> 0
             }
 
@@ -82,7 +82,7 @@ class OrdersAdapter : ListAdapter<OrderItem, OrdersAdapter.OrderViewHolder>(Diff
             }
 
             // Delivered banner
-            if (order.trackingStatus == "delivered") {
+            if (order.trackingStatus == "done") {
                 binding.tvDelivered.visibility = android.view.View.VISIBLE
             } else {
                 binding.tvDelivered.visibility = android.view.View.GONE

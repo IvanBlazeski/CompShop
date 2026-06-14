@@ -122,7 +122,7 @@ class CartActivity : AppCompatActivity() {
             "deliveryMethod" to deliveryMethod,
             "status" to status,
             "isPaid" to (paymentMethod == "Card"),
-            "trackingStatus" to "order_placed",
+            "trackingStatus" to "placed",
             "createdAt" to FieldValue.serverTimestamp()
         )
 
