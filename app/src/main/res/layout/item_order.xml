@@ -30,7 +30,7 @@
             android:id="@+id/tvOrderStatus"
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
-            android:text="paid"
+            android:text="PAID"
             android:textColor="#FFFFFF"
             android:textSize="12sp"
             android:textStyle="bold"
@@ -59,12 +59,13 @@
         android:background="#1A00D4FF"
         android:layout_marginBottom="8dp"/>
 
-    <!-- Footer Row -->
+    <!-- Payment + Delivery -->
     <LinearLayout
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
         android:orientation="horizontal"
-        android:gravity="center_vertical">
+        android:gravity="center_vertical"
+        android:layout_marginBottom="12dp">
 
         <TextView
             android:id="@+id/tvPaymentMethod"
@@ -74,6 +75,15 @@
             android:text="💳 Card"
             android:textColor="#99FFFFFF"
             android:textSize="13sp"/>
+
+        <TextView
+            android:id="@+id/tvDeliveryMethod"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:text="📦 Standard"
+            android:textColor="#99FFFFFF"
+            android:textSize="13sp"
+            android:layout_marginEnd="8dp"/>
 
         <TextView
             android:id="@+id/tvOrderTotal"
@@ -86,4 +96,222 @@
 
     </LinearLayout>
 
-</LinearLayout>
+    <!-- Tracking Divider -->
+    <View
+        android:layout_width="match_parent"
+        android:layout_height="1dp"
+        android:background="#1A00D4FF"
+        android:layout_marginBottom="12dp"/>
+
+    <!-- Tracking Title -->
+    <TextView
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:text="📍 Tracking"
+        android:textColor="#00D4FF"
+        android:textSize="12sp"
+        android:textStyle="bold"
+        android:layout_marginBottom="10dp"/>
+
+    <!-- Tracking Steps -->
+    <LinearLayout
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:orientation="horizontal"
+        android:gravity="center_vertical"
+        android:layout_marginBottom="8dp">
+
+        <!-- Step 1 -->
+        <LinearLayout
+            android:layout_width="0dp"
+            android:layout_height="wrap_content"
+            android:layout_weight="1"
+            android:orientation="vertical"
+            android:gravity="center_horizontal">
+
+            <TextView
+                android:id="@+id/step1Dot"
+                android:layout_width="22dp"
+                android:layout_height="22dp"
+                android:background="@drawable/btn_neon_gradient"
+                android:gravity="center"
+                android:text="✓"
+                android:textColor="#FFFFFF"
+                android:textSize="10sp"
+                android:layout_marginBottom="4dp"/>
+
+            <TextView
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:text="Placed"
+                android:textColor="#FFFFFF"
+                android:textSize="9sp"/>
+
+        </LinearLayout>
+
+        <!-- Line 1 -->
+        <View
+            android:id="@+id/line1"
+            android:layout_width="0dp"
+            android:layout_height="2dp"
+            android:layout_weight="0.5"
+            android:layout_marginBottom="16dp"
+            android:background="#1A00D4FF"/>
+
+        <!-- Step 2 -->
+        <LinearLayout
+            android:layout_width="0dp"
+            android:layout_height="wrap_content"
+            android:layout_weight="1"
+            android:orientation="vertical"
+            android:gravity="center_horizontal">
+
+            <TextView
+                android:id="@+id/step2Dot"
+                android:layout_width="22dp"
+                android:layout_height="22dp"
+                android:background="@drawable/btn_social_neon"
+                android:gravity="center"
+                android:text=""
+                android:textColor="#FFFFFF"
+                android:textSize="10sp"
+                android:layout_marginBottom="4dp"/>
+
+            <TextView
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:text="Process"
+                android:textColor="#80FFFFFF"
+                android:textSize="9sp"/>
+
+        </LinearLayout>
+
+        <!-- Line 2 -->
+        <View
+            android:id="@+id/line2"
+            android:layout_width="0dp"
+            android:layout_height="2dp"
+            android:layout_weight="0.5"
+            android:layout_marginBottom="16dp"
+            android:background="#1A00D4FF"/>
+
+        <!-- Step 3 -->
+        <LinearLayout
+            android:layout_width="0dp"
+            android:layout_height="wrap_content"
+            android:layout_weight="1"
+            android:orientation="vertical"
+            android:gravity="center_horizontal">
+
+            <TextView
+                android:id="@+id/step3Dot"
+                android:layout_width="22dp"
+                android:layout_height="22dp"
+                android:background="@drawable/btn_social_neon"
+                android:gravity="center"
+                android:text=""
+                android:textColor="#FFFFFF"
+                android:textSize="10sp"
+                android:layout_marginBottom="4dp"/>
+
+            <TextView
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:text="Shipped"
+                android:textColor="#80FFFFFF"
+                android:textSize="9sp"/>
+
+        </LinearLayout>
+
+        <!-- Line 3 -->
+        <View
+            android:id="@+id/line3"
+            android:layout_width="0dp"
+            android:layout_height="2dp"
+            android:layout_weight="0.5"
+            android:layout_marginBottom="16dp"
+            android:background="#1A00D4FF"/>
+
+        <!-- Step 4 -->
+        <LinearLayout
+            android:layout_width="0dp"
+            android:layout_height="wrap_content"
+            android:layout_weight="1"
+            android:orientation="vertical"
+            android:gravity="center_horizontal">
+
+            <TextView
+                android:id="@+id/step4Dot"
+                android:layout_width="22dp"
+                android:layout_height="22dp"
+                android:background="@drawable/btn_social_neon"
+                android:gravity="center"
+                android:text=""
+                android:textColor="#FFFFFF"
+                android:textSize="10sp"
+                android:layout_marginBottom="4dp"/>
+
+            <TextView
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:text="Delivery"
+                android:textColor="#80FFFFFF"
+                android:textSize="9sp"/>
+
+        </LinearLayout>
+
+        <!-- Line 4 -->
+        <View
+            android:id="@+id/line4"
+            android:layout_width="0dp"
+            android:layout_height="2dp"
+            android:layout_weight="0.5"
+            android:layout_marginBottom="16dp"
+            android:background="#1A00D4FF"/>
+
+        <!-- Step 5 -->
+        <LinearLayout
+            android:layout_width="0dp"
+            android:layout_height="wrap_content"
+            android:layout_weight="1"
+            android:orientation="vertical"
+            android:gravity="center_horizontal">
+
+            <TextView
+                android:id="@+id/step5Dot"
+                android:layout_width="22dp"
+                android:layout_height="22dp"
+                android:background="@drawable/btn_social_neon"
+                android:gravity="center"
+                android:text=""
+                android:textColor="#FFFFFF"
+                android:textSize="10sp"
+                android:layout_marginBottom="4dp"/>
+
+            <TextView
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:text="Done"
+                android:textColor="#80FFFFFF"
+                android:textSize="9sp"/>
+
+        </LinearLayout>
+
+    </LinearLayout>
+
+    <!-- Delivered Banner -->
+    <TextView
+        android:id="@+id/tvDelivered"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:text="✅ Package delivered!"
+        android:textColor="#00E5FF"
+        android:textSize="13sp"
+        android:textStyle="bold"
+        android:gravity="center"
+        android:background="@drawable/btn_social_neon"
+        android:padding="8dp"
+        android:layout_marginTop="8dp"
+        android:visibility="gone"/>
+        </LinearLayout>
+

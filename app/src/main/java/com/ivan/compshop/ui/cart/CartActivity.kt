@@ -103,23 +103,26 @@ class CartActivity : AppCompatActivity() {
 
         val status = if (paymentMethod == "Card") "paid" else "pending"
 
+        val orderItems = items.map { item ->
+            hashMapOf(
+                "computerId" to item.computerId,
+                "computerName" to item.computerName,
+                "computerBrand" to item.computerBrand,
+                "price" to item.price,
+                "quantity" to item.quantity
+            )
+        }
+
         val order = hashMapOf(
             "userId" to userId,
             "userEmail" to userId,
-            "items" to items.map { item ->
-                hashMapOf(
-                    "computerId" to item.computerId,
-                    "computerName" to item.computerName,
-                    "computerBrand" to item.computerBrand,
-                    "price" to item.price,
-                    "quantity" to item.quantity
-                )
-            },
+            "items" to orderItems,
             "totalPrice" to finalTotal,
             "paymentMethod" to paymentMethod,
             "deliveryMethod" to deliveryMethod,
             "status" to status,
             "isPaid" to (paymentMethod == "Card"),
+            "trackingStatus" to "order_placed",
             "createdAt" to FieldValue.serverTimestamp()
         )
 
@@ -128,7 +131,6 @@ class CartActivity : AppCompatActivity() {
             .collection(userId)
             .add(order)
             .addOnSuccessListener {
-                // Нотификација
                 val notifTitle = if (paymentMethod == "Card") "Payment confirmed! 💳✅" else "Order placed! 📦"
                 val notifMessage = if (paymentMethod == "Card")
                     "Your payment of $${"%.2f".format(finalTotal)} was successful!"

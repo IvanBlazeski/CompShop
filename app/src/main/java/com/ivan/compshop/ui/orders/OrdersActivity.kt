@@ -43,18 +43,17 @@ class OrdersActivity : AppCompatActivity() {
             }
         } ?: return
 
-        android.util.Log.d("ORDERS", "Loading for: $userId")
-
         val today = java.text.SimpleDateFormat("yyyy-MM-dd", java.util.Locale.getDefault())
             .format(java.util.Date())
 
-        // Директно читај само денешните нарачки
         firestore.collection("orders")
             .document(today)
             .collection(userId)
-            .get()
-            .addOnSuccessListener { snapshot ->
-                android.util.Log.d("ORDERS", "Found: ${snapshot.size()}")
+            .addSnapshotListener { snapshot, error ->
+                if (error != null || snapshot == null) {
+                    showEmpty()
+                    return@addSnapshotListener
+                }
 
                 val orders = snapshot.documents.mapNotNull { doc ->
                     val itemsList = doc.get("items") as? List<Map<String, Any>> ?: emptyList()
@@ -68,7 +67,8 @@ class OrdersActivity : AppCompatActivity() {
                         totalPrice = doc.getDouble("totalPrice") ?: 0.0,
                         paymentMethod = doc.getString("paymentMethod") ?: "",
                         deliveryMethod = doc.getString("deliveryMethod") ?: "",
-                        status = doc.getString("status") ?: "pending"
+                        status = doc.getString("status") ?: "pending",
+                        trackingStatus = doc.getString("trackingStatus")?.lowercase() ?: "order_placed"
                     )
                 }
 
@@ -78,10 +78,6 @@ class OrdersActivity : AppCompatActivity() {
                     binding.rvOrders.visibility = View.VISIBLE
                     adapter.submitList(orders)
                 }
-            }
-            .addOnFailureListener { e ->
-                android.util.Log.e("ORDERS", "Error: ${e.message}")
-                showEmpty()
             }
     }
 

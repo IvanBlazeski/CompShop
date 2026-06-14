@@ -6,6 +6,7 @@ import androidx.recyclerview.widget.DiffUtil
 import androidx.recyclerview.widget.ListAdapter
 import androidx.recyclerview.widget.RecyclerView
 import com.ivan.compshop.databinding.ItemOrderBinding
+import com.ivan.compshop.R
 
 data class OrderItem(
     val id: String = "",
@@ -14,7 +15,8 @@ data class OrderItem(
     val totalPrice: Double = 0.0,
     val paymentMethod: String = "",
     val deliveryMethod: String = "",
-    val status: String = "pending"
+    val status: String = "pending",
+    val trackingStatus: String = "order_placed"
 )
 
 class OrdersAdapter : ListAdapter<OrderItem, OrdersAdapter.OrderViewHolder>(DiffCallback()) {
@@ -35,13 +37,57 @@ class OrdersAdapter : ListAdapter<OrderItem, OrdersAdapter.OrderViewHolder>(Diff
             binding.tvOrderDate.text = order.date
             binding.tvOrderItems.text = order.items
             binding.tvOrderTotal.text = "$${"%.2f".format(order.totalPrice)}"
-            binding.tvPaymentMethod.text = if (order.paymentMethod == "Card") "💳 Card" else "💵 Cash on delivery"
+            binding.tvPaymentMethod.text = if (order.paymentMethod == "Card") "💳 Card" else "💵 Cash"
+            binding.tvDeliveryMethod.text = if (order.deliveryMethod == "Express") "⚡ Express" else "📦 Standard"
 
             binding.tvOrderStatus.text = order.status.uppercase()
             binding.tvOrderStatus.setBackgroundResource(
-                if (order.status == "paid") com.ivan.compshop.R.drawable.btn_neon_gradient
-                else com.ivan.compshop.R.drawable.btn_social_neon
+                if (order.status == "paid") R.drawable.btn_neon_gradient
+                else R.drawable.btn_social_neon
             )
+
+            val steps = listOf(
+                binding.step1Dot, binding.step2Dot, binding.step3Dot,
+                binding.step4Dot, binding.step5Dot
+            )
+            val lines = listOf(
+                binding.line1, binding.line2, binding.line3, binding.line4
+            )
+
+            val currentStep = when (order.trackingStatus) {
+                "order_placed" -> 0
+                "processing" -> 1
+                "shipped" -> 2
+                "out_for_delivery" -> 3
+                "delivered" -> 4
+                else -> 0
+            }
+
+            steps.forEachIndexed { index, dot ->
+                if (index <= currentStep) {
+                    dot.setBackgroundResource(R.drawable.btn_neon_gradient)
+                    dot.text = "✓"
+                    dot.setTextColor(android.graphics.Color.WHITE)
+                } else {
+                    dot.setBackgroundResource(R.drawable.btn_social_neon)
+                    dot.text = ""
+                }
+            }
+
+            lines.forEachIndexed { index, line ->
+                line.setBackgroundColor(
+                    if (index < currentStep) android.graphics.Color.parseColor("#00D4FF")
+                    else android.graphics.Color.parseColor("#1A00D4FF")
+                )
+            }
+
+            // Delivered banner
+            if (order.trackingStatus == "delivered") {
+                binding.tvDelivered.visibility = android.view.View.VISIBLE
+            } else {
+                binding.tvDelivered.visibility = android.view.View.GONE
+            }
+        }
         }
     }
 
@@ -49,4 +95,3 @@ class OrdersAdapter : ListAdapter<OrderItem, OrdersAdapter.OrderViewHolder>(Diff
         override fun areItemsTheSame(oldItem: OrderItem, newItem: OrderItem) = oldItem.id == newItem.id
         override fun areContentsTheSame(oldItem: OrderItem, newItem: OrderItem) = oldItem == newItem
     }
-}
