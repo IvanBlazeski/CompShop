@@ -6,6 +6,7 @@ import com.ivan.compshop.data.local.AppDatabase
 import com.ivan.compshop.data.repository.AuthRepository
 import com.ivan.compshop.data.repository.CartRepository
 import com.ivan.compshop.data.repository.ComputerRepository
+import androidx.appcompat.app.AppCompatDelegate
 
 class CompShopApplication : Application() {
 
@@ -18,6 +19,25 @@ class CompShopApplication : Application() {
 
     override fun onCreate() {
         super.onCreate()
+
+        val prefs = getSharedPreferences("settings", MODE_PRIVATE)
+
+        // Dark Mode
+        val isDark = prefs.getBoolean("dark_mode", true)
+        if (isDark) {
+            AppCompatDelegate.setDefaultNightMode(AppCompatDelegate.MODE_NIGHT_YES)
+        } else {
+            AppCompatDelegate.setDefaultNightMode(AppCompatDelegate.MODE_NIGHT_NO)
+        }
+
+        // Language
+        val lang = prefs.getString("language", "en") ?: "en"
+        val locale = java.util.Locale(lang)
+        java.util.Locale.setDefault(locale)
+        val config = android.content.res.Configuration(resources.configuration)
+        config.setLocale(locale)
+        resources.updateConfiguration(config, resources.displayMetrics)
+
         analytics = FirebaseAnalytics.getInstance(this)
     }
 }

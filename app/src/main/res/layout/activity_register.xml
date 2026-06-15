@@ -34,7 +34,7 @@
             <TextView
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
-                android:text="Create Account"
+                android:text="@string/create_account"
                 android:textSize="13sp"
                 android:textColor="#AAFFFFFF"
                 android:letterSpacing="0.08"
@@ -181,7 +181,7 @@
                 <TextView
                     android:layout_width="wrap_content"
                     android:layout_height="wrap_content"
-                    android:text="Already have an account? "
+                    android:text="@string/have_account"
                     android:textColor="#99FFFFFF"
                     android:textSize="14sp"/>
 
@@ -189,7 +189,7 @@
                     android:id="@+id/tvLogin"
                     android:layout_width="wrap_content"
                     android:layout_height="wrap_content"
-                    android:text="Sign in"
+                    android:text="@string/login"
                     android:textColor="#00E5FF"
                     android:textSize="14sp"
                     android:textStyle="bold"/>

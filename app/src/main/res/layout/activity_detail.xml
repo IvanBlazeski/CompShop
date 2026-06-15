@@ -37,7 +37,7 @@
                 android:layout_width="0dp"
                 android:layout_height="wrap_content"
                 android:layout_weight="1"
-                android:text="Details"
+                android:text="@string/details_title"
                 android:textSize="20sp"
                 android:textStyle="bold"
                 android:textColor="#FFFFFF"
@@ -151,7 +151,7 @@
                     android:layout_width="0dp"
                     android:layout_height="wrap_content"
                     android:layout_weight="1"
-                    android:text="⚡ Processor"
+                    android:text="@string/processor"
                     android:textColor="#99FFFFFF"
                     android:textSize="14sp"/>
 
@@ -178,7 +178,7 @@
                     android:layout_width="0dp"
                     android:layout_height="wrap_content"
                     android:layout_weight="1"
-                    android:text="💾 RAM"
+                    android:text="@string/ram"
                     android:textColor="#99FFFFFF"
                     android:textSize="14sp"/>
 
@@ -205,7 +205,7 @@
                     android:layout_width="0dp"
                     android:layout_height="wrap_content"
                     android:layout_weight="1"
-                    android:text="💿 Storage"
+                    android:text="@string/storage"
                     android:textColor="#99FFFFFF"
                     android:textSize="14sp"/>
 
@@ -232,7 +232,7 @@
                     android:layout_width="0dp"
                     android:layout_height="wrap_content"
                     android:layout_weight="1"
-                    android:text="🎮 Graphics"
+                    android:text="@string/graphics"
                     android:textColor="#99FFFFFF"
                     android:textSize="14sp"/>
 
@@ -258,7 +258,7 @@
             <TextView
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
-                android:text="Description"
+                android:text="@string/details"
                 android:textSize="16sp"
                 android:textStyle="bold"
                 android:textColor="#00D4FF"
@@ -284,7 +284,7 @@
             <TextView
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
-                android:text="Quantity"
+                android:text="@string/quantity"
                 android:textSize="14sp"
                 android:textColor="#99FFFFFF"
                 android:layout_marginBottom="8dp"/>
@@ -335,7 +335,7 @@
                 android:id="@+id/btnAddToCart"
                 android:layout_width="match_parent"
                 android:layout_height="58dp"
-                android:text="Add to Cart"
+                android:text="@string/add_to_cart"
                 android:textSize="16sp"
                 android:textStyle="bold"
                 android:textColor="#FFFFFF"
@@ -348,7 +348,7 @@
                 android:id="@+id/btnBuyNow"
                 android:layout_width="match_parent"
                 android:layout_height="58dp"
-                android:text="Buy Now"
+                android:text="@string/buy_now"
                 android:textSize="16sp"
                 android:textStyle="bold"
                 android:textColor="#00D4FF"

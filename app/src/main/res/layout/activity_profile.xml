@@ -37,7 +37,7 @@
                 android:layout_width="0dp"
                 android:layout_height="wrap_content"
                 android:layout_weight="1"
-                android:text="Profile"
+                android:text="@string/profile"
                 android:textSize="22sp"
                 android:textStyle="bold"
                 android:textColor="#FFFFFF"
@@ -58,17 +58,32 @@
             android:layout_marginBottom="24dp">
 
             <FrameLayout
-                android:layout_width="100dp"
-                android:layout_height="100dp"
-                android:layout_marginBottom="12dp">
+                android:layout_width="110dp"
+                android:layout_height="110dp"
+                android:layout_marginBottom="12dp"
+                android:clickable="true"
+                android:focusable="true"
+                android:id="@+id/layoutAvatar">
 
                 <ImageView
-                    android:layout_width="100dp"
-                    android:layout_height="100dp"
+                    android:id="@+id/ivAvatar"
+                    android:layout_width="110dp"
+                    android:layout_height="110dp"
                     android:src="@drawable/ic_profile"
                     android:background="@drawable/btn_social_neon"
                     android:padding="24dp"
+                    android:scaleType="centerCrop"
                     app:tint="#00D4FF"/>
+
+                <TextView
+                    android:layout_width="match_parent"
+                    android:layout_height="28dp"
+                    android:layout_gravity="bottom"
+                    android:background="#AA000000"
+                    android:gravity="center"
+                    android:text="📷 Edit"
+                    android:textColor="#FFFFFF"
+                    android:textSize="11sp"/>
 
             </FrameLayout>
 
@@ -88,7 +103,16 @@
                 android:layout_height="wrap_content"
                 android:text="email@example.com"
                 android:textSize="14sp"
-                android:textColor="#00D4FF"/>
+                android:textColor="#00D4FF"
+                android:layout_marginBottom="4dp"/>
+
+            <TextView
+                android:id="@+id/tvMemberSince"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:text="Member since 2026"
+                android:textSize="12sp"
+                android:textColor="#80FFFFFF"/>
 
         </LinearLayout>
 
@@ -106,7 +130,7 @@
             <TextView
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
-                android:text="Personal Info"
+                android:text="@string/personal_info"
                 android:textSize="16sp"
                 android:textStyle="bold"
                 android:textColor="#00D4FF"
@@ -116,7 +140,7 @@
             <TextView
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
-                android:text="Full Name"
+                android:text="@string/full_name"
                 android:textColor="#80FFFFFF"
                 android:textSize="12sp"
                 android:layout_marginBottom="4dp"/>
@@ -132,23 +156,24 @@
                 android:layout_marginBottom="16dp">
 
                 <EditText
+                    android:enabled="false"
+                    android:alpha="0.7"
                     android:id="@+id/etFullName"
                     android:layout_width="match_parent"
                     android:layout_height="match_parent"
-                    android:hint="Enter your full name"
+                    android:hint="@string/full_name"
                     android:inputType="textPersonName"
                     android:textColor="#FFFFFF"
                     android:textColorHint="#73FFFFFF"
                     android:background="@android:color/transparent"
                     android:textSize="15sp"/>
-
             </LinearLayout>
 
             <!-- Phone -->
             <TextView
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
-                android:text="Phone"
+                android:text="@string/phone"
                 android:textColor="#80FFFFFF"
                 android:textSize="12sp"
                 android:layout_marginBottom="4dp"/>
@@ -164,10 +189,12 @@
                 android:layout_marginBottom="16dp">
 
                 <EditText
+                    android:enabled="false"
+                    android:alpha="0.7"
                     android:id="@+id/etPhone"
                     android:layout_width="match_parent"
                     android:layout_height="match_parent"
-                    android:hint="Enter your phone"
+                    android:hint="@string/phone"
                     android:inputType="phone"
                     android:textColor="#FFFFFF"
                     android:textColorHint="#73FFFFFF"
@@ -180,7 +207,7 @@
             <TextView
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
-                android:text="Address"
+                android:text="@string/address"
                 android:textColor="#80FFFFFF"
                 android:textSize="12sp"
                 android:layout_marginBottom="4dp"/>
@@ -196,10 +223,12 @@
                 android:layout_marginBottom="20dp">
 
                 <EditText
+                    android:enabled="false"
+                    android:alpha="0.7"
                     android:id="@+id/etAddress"
                     android:layout_width="match_parent"
                     android:layout_height="match_parent"
-                    android:hint="Enter your address"
+                    android:hint="@string/address"
                     android:inputType="textPostalAddress"
                     android:textColor="#FFFFFF"
                     android:textColorHint="#73FFFFFF"
@@ -208,18 +237,39 @@
 
             </LinearLayout>
 
-            <!-- Save Button -->
-            <Button
-                android:id="@+id/btnSave"
+            <!-- Buttons -->
+            <LinearLayout
                 android:layout_width="match_parent"
-                android:layout_height="52dp"
-                android:text="Save Changes"
-                android:textSize="16sp"
-                android:textStyle="bold"
-                android:textColor="#FFFFFF"
-                android:background="@drawable/btn_neon_gradient"
-                android:stateListAnimator="@null"/>
+                android:layout_height="wrap_content"
+                android:orientation="horizontal">
 
+                <Button
+                    android:id="@+id/btnEdit"
+                    android:layout_width="0dp"
+                    android:layout_height="52dp"
+                    android:layout_weight="1"
+                    android:text="@string/edit_profile"
+                    android:textSize="15sp"
+                    android:textStyle="bold"
+                    android:textColor="#00D4FF"
+                    android:background="@drawable/btn_social_neon"
+                    android:layout_marginEnd="8dp"
+                    android:stateListAnimator="@null"/>
+
+                <Button
+                    android:id="@+id/btnSave"
+                    android:layout_width="0dp"
+                    android:layout_height="52dp"
+                    android:layout_weight="1"
+                    android:text="@string/save"
+                    android:textSize="15sp"
+                    android:textStyle="bold"
+                    android:textColor="#FFFFFF"
+                    android:background="@drawable/btn_neon_gradient"
+                    android:visibility="gone"
+                    android:stateListAnimator="@null"/>
+
+            </LinearLayout>
         </LinearLayout>
 
         <!-- Stats Card -->
@@ -252,7 +302,7 @@
                 <TextView
                     android:layout_width="wrap_content"
                     android:layout_height="wrap_content"
-                    android:text="Orders"
+                    android:text="@string/orders_stat"
                     android:textSize="13sp"
                     android:textColor="#99FFFFFF"/>
 
@@ -282,9 +332,140 @@
                 <TextView
                     android:layout_width="wrap_content"
                     android:layout_height="wrap_content"
-                    android:text="Total Spent"
+                    android:text="@string/total_spent"
                     android:textSize="13sp"
                     android:textColor="#99FFFFFF"/>
+
+            </LinearLayout>
+
+        </LinearLayout>
+
+        <!-- Settings Card -->
+        <LinearLayout
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:orientation="vertical"
+            android:background="@drawable/card_glass_neon"
+            android:layout_marginStart="20dp"
+            android:layout_marginEnd="20dp"
+            android:layout_marginBottom="16dp"
+            android:padding="20dp">
+
+            <TextView
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:text="@string/settings_title"
+                android:textSize="16sp"
+                android:textStyle="bold"
+                android:textColor="#00D4FF"
+                android:layout_marginBottom="16dp"/>
+
+            <!-- Change Password -->
+            <LinearLayout
+                android:id="@+id/layoutChangePassword"
+                android:layout_width="match_parent"
+                android:layout_height="52dp"
+                android:orientation="horizontal"
+                android:gravity="center_vertical"
+                android:background="@drawable/btn_social_neon"
+                android:paddingStart="16dp"
+                android:paddingEnd="16dp"
+                android:layout_marginBottom="10dp"
+                android:clickable="true"
+                android:focusable="true">
+
+                <TextView
+                    android:layout_width="0dp"
+                    android:layout_height="wrap_content"
+                    android:layout_weight="1"
+                    android:text="@string/change_password"
+                    android:textColor="#FFFFFF"
+                    android:textSize="14sp"/>
+
+                <TextView
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:text="›"
+                    android:textColor="#00D4FF"
+                    android:textSize="20sp"/>
+
+            </LinearLayout>
+
+            <!-- Language -->
+            <LinearLayout
+                android:layout_width="match_parent"
+                android:layout_height="52dp"
+                android:orientation="horizontal"
+                android:gravity="center_vertical"
+                android:background="@drawable/btn_social_neon"
+                android:paddingStart="16dp"
+                android:paddingEnd="16dp"
+                android:layout_marginBottom="10dp">
+
+                <TextView
+                    android:layout_width="0dp"
+                    android:layout_height="wrap_content"
+                    android:layout_weight="1"
+                    android:text="@string/language_switch"
+                    android:textColor="#FFFFFF"
+                    android:textSize="14sp"/>
+
+                <TextView
+                    android:id="@+id/btnLanguageEN"
+                    android:layout_width="wrap_content"
+                    android:layout_height="32dp"
+                    android:text="EN"
+                    android:textColor="#FFFFFF"
+                    android:textSize="12sp"
+                    android:textStyle="bold"
+                    android:gravity="center"
+                    android:paddingStart="10dp"
+                    android:paddingEnd="10dp"
+                    android:background="@drawable/btn_neon_gradient"
+                    android:layout_marginEnd="8dp"
+                    android:clickable="true"
+                    android:focusable="true"/>
+
+                <TextView
+                    android:id="@+id/btnLanguageMK"
+                    android:layout_width="wrap_content"
+                    android:layout_height="32dp"
+                    android:text="MK"
+                    android:textColor="#00D4FF"
+                    android:textSize="12sp"
+                    android:textStyle="bold"
+                    android:gravity="center"
+                    android:paddingStart="10dp"
+                    android:paddingEnd="10dp"
+                    android:background="@drawable/btn_social_neon"
+                    android:clickable="true"
+                    android:focusable="true"/>
+
+            </LinearLayout>
+
+            <!-- Dark/Light Mode -->
+            <LinearLayout
+                android:layout_width="match_parent"
+                android:layout_height="52dp"
+                android:orientation="horizontal"
+                android:gravity="center_vertical"
+                android:background="@drawable/btn_social_neon"
+                android:paddingStart="16dp"
+                android:paddingEnd="16dp">
+
+                <TextView
+                    android:layout_width="0dp"
+                    android:layout_height="wrap_content"
+                    android:layout_weight="1"
+                    android:text="@string/dark_mode"
+                    android:textColor="#FFFFFF"
+                    android:textSize="14sp"/>
+
+                <androidx.appcompat.widget.SwitchCompat
+                    android:id="@+id/switchDarkMode"
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:checked="true"/>
 
             </LinearLayout>
 
@@ -295,7 +476,7 @@
             android:id="@+id/btnLogout"
             android:layout_width="match_parent"
             android:layout_height="52dp"
-            android:text="Logout"
+            android:text="@string/logout"
             android:textSize="16sp"
             android:textStyle="bold"
             android:textColor="#FF4081"

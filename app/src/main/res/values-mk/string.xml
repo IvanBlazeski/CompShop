@@ -1,12 +1,14 @@
 <resources>
     <!-- App -->
     <string name="app_name">CompShop</string>
+    <string name="app_subtitle">Најди го твојот следен компјутер</string>
 
     <!-- Auth -->
     <string name="login">Најава</string>
     <string name="register">Регистрација</string>
     <string name="email">Е-пошта</string>
     <string name="password">Лозинка</string>
+    <string name="full_name">Име и презиме</string>
     <string name="forgot_password">Заборавена лозинка?</string>
     <string name="no_account">Немате акаунт? Регистрирајте се</string>
     <string name="have_account">Веќе имате акаунт? Најавете се</string>
@@ -16,41 +18,85 @@
     <string name="facebook_app_id">4428569700759072</string>
     <string name="fb_login_protocol_scheme">fb4428569700759072</string>
     <string name="facebook_client_token">284390a4c6cbb93b9288f6c589b713f0</string>
+    <string name="create_account">Создај акаунт</string>
 
     <!-- Home -->
     <string name="home">Почетна</string>
     <string name="search">Пребарување</string>
     <string name="search_hint">Пребарај компјутери...</string>
     <string name="filter">Филтер</string>
-    <string name="all_categories">Сите категории</string>
+    <string name="all_categories">Сите</string>
     <string name="sort_by">Сортирај по</string>
-    <string name="price_low_high">Цена: Од ниска кон висока</string>
-    <string name="price_high_low">Цена: Од висока кон ниска</string>
+    <string name="price_low_high">Најниска цена</string>
+    <string name="price_high_low">Највисока цена</string>
+    <string name="default_sort">Стандардно</string>
+    <string name="filter_products">Филтрирај производи</string>
+    <string name="price_range">Ценовен опсег</string>
+    <string name="under_1000">Под $1000</string>
+    <string name="price_1000_1500">$1000 - $1500</string>
+    <string name="over_1500">Над $1500</string>
+    <string name="clear_filters">Исчисти</string>
+    <string name="apply_filter">Примени филтер</string>
+    <string name="no_computers">Нема компјутери</string>
+    <string name="no_computers_hint">Обиди се со различно пребарување или филтри.</string>
 
     <!-- Computer -->
     <string name="price">Цена</string>
     <string name="brand">Бренд</string>
     <string name="model">Модел</string>
-    <string name="processor">Процесор</string>
-    <string name="ram">RAM меморија</string>
-    <string name="storage">Складирање</string>
-    <string name="graphics">Графичка картичка</string>
+    <string name="processor">⚡ Процесор</string>
+    <string name="ram">💾 RAM меморија</string>
+    <string name="storage">💿 Складирање</string>
+    <string name="graphics">🎮 Графичка картичка</string>
     <string name="add_to_cart">Додај во кошничка</string>
+    <string name="add">Додај</string>
+    <string name="buy_now">Купи сега</string>
     <string name="details">Детали</string>
+    <string name="details_title">Детали</string>
     <string name="specifications">Спецификации</string>
     <string name="in_stock">На залиха</string>
     <string name="out_of_stock">Нема на залиха</string>
+    <string name="quantity">Количина</string>
+    <string name="filter_processor">Процесор</string>
+    <string name="filter_price_range">Ценовен опсег</string>
+    <string name="filter_all">Сите</string>
+    <string name="filter_under_1000">Под $1000</string>
+    <string name="filter_1000_1500">$1000-1500</string>
+    <string name="filter_over_1500">Над $1500</string>
+    <string name="filter_default">Стандардно</string>
+    <string name="filter_lowest">Најниска</string>
+    <string name="filter_highest">Највисока</string>
 
     <!-- Cart -->
     <string name="cart">Кошничка</string>
     <string name="cart_empty">Вашата кошничка е празна</string>
     <string name="total">Вкупно</string>
     <string name="checkout">Нарачај</string>
-    <string name="remove">Отстрани</string>
-    <string name="quantity">Количина</string>
+    <string name="remove">✕</string>
+
+    <!-- Checkout -->
+    <string name="checkout_title">Нарачај</string>
+    <string name="payment_method">Начин на плаќање</string>
+    <string name="card_payment">💳 Картичка</string>
+    <string name="cash_payment">💵 Готовина</string>
+    <string name="delivery_method">Начин на достава</string>
+    <string name="standard_delivery">📦 Стандардна</string>
+    <string name="express_delivery">⚡ Експрес</string>
+    <string name="days_3_5">3-5 дена</string>
+    <string name="days_1_2">1-2 дена • $9.99</string>
+    <string name="free_over_1000">Бесплатно над $1000</string>
+    <string name="confirm_order">Потврди нарачка</string>
+    <string name="card_payment_title">💳 Плаќање со картичка</string>
+    <string name="card_number_hint">Број на картичка (16 цифри)</string>
+    <string name="cardholder_name">Ime на сопственик</string>
+    <string name="expiry_hint">MM/GG</string>
+    <string name="cvv_hint">CVV</string>
+    <string name="pay_now">Плати сега</string>
 
     <!-- Orders -->
     <string name="orders">Нарачки</string>
+    <string name="my_orders">Моите нарачки</string>
+    <string name="no_orders">Нема нарачки\nПочни со купување!</string>
     <string name="order_history">Историја на нарачки</string>
     <string name="order_number">Нарачка #</string>
     <string name="order_date">Датум</string>
@@ -58,16 +104,38 @@
     <string name="order_pending">Во обработка</string>
     <string name="order_confirmed">Потврдена</string>
     <string name="order_delivered">Доставена</string>
+    <string name="order_placed">Нарачката е успешно поставена!</string>
+    <string name="tracking">📍 Следење</string>
+    <string name="step_placed">Нарачана</string>
+    <string name="step_process">Обработка</string>
+    <string name="step_shipped">Испратена</string>
+    <string name="step_delivery">Достава</string>
+    <string name="step_done">Готово</string>
+    <string name="package_delivered">✅ Пакетот е доставен!</string>
 
     <!-- Profile -->
     <string name="profile">Профил</string>
+    <string name="personal_info">Лични информации</string>
     <string name="edit_profile">Уреди профил</string>
-    <string name="logout">Одјава</string>
-    <string name="full_name">Име и презиме</string>
-    <string name="phone">Телефон</string>
-    <string name="address">Адреса</string>
     <string name="save">Зачувај</string>
     <string name="cancel">Откажи</string>
+    <string name="logout">Одјава</string>
+    <string name="phone">Телефон</string>
+    <string name="address">Адреса</string>
+    <string name="settings_title">Поставки</string>
+    <string name="change_password">🔒 Промени лозинка</string>
+    <string name="language_switch">🌐 Јазик</string>
+    <string name="dark_mode">🌙 Темна тема</string>
+    <string name="orders_stat">Нарачки</string>
+    <string name="total_spent">Вкупно потрошено</string>
+    <string name="current_password">Тековна лозинка</string>
+    <string name="new_password">Нова лозинка (мин 6 знаци)</string>
+    <string name="change_password_title">🔒 Промени лозинка</string>
+
+    <!-- Notifications -->
+    <string name="notifications">Известувања</string>
+    <string name="mark_all_read">Означи сите како прочитани</string>
+    <string name="no_notifications">Нема известувања</string>
 
     <!-- Navigation -->
     <string name="nav_home">Почетна</string>
@@ -80,5 +148,4 @@
     <string name="error_occurred">Настана грешка</string>
     <string name="no_results">Нема резултати</string>
     <string name="added_to_cart">Додадено во кошничка!</string>
-    <string name="order_placed">Нарачката е успешно поставена!</string>
 </resources>

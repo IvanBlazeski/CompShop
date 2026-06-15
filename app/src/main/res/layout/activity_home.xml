@@ -36,7 +36,7 @@
             <TextView
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
-                android:text="Find your next computer"
+                android:text="@string/app_subtitle"
                 android:textSize="12sp"
                 android:textColor="#7300D4FF"/>
 
@@ -163,7 +163,7 @@
                     android:id="@+id/chipAll"
                     android:layout_width="wrap_content"
                     android:layout_height="36dp"
-                    android:text="All"
+                    android:text="@string/all_categories"
                     android:textColor="#FFFFFF"
                     android:textSize="13sp"
                     android:textStyle="bold"
@@ -242,7 +242,7 @@
             android:id="@+id/tvEmpty"
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
-            android:text="No computers found\nTry changing your search or filters."
+            android:text="@string/no_computers"
             android:textColor="#80FFFFFF"
             android:textSize="16sp"
             android:gravity="center"

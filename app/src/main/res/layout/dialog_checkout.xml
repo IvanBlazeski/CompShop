@@ -14,7 +14,7 @@
         <TextView
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
-            android:text="Checkout"
+            android:text="@string/checkout_title"
             android:textSize="22sp"
             android:textStyle="bold"
             android:textColor="#FFFFFF"
@@ -31,7 +31,7 @@
         <TextView
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
-            android:text="Payment Method"
+            android:text="@string/payment_method"
             android:textColor="#00D4FF"
             android:textSize="14sp"
             android:textStyle="bold"
@@ -48,7 +48,7 @@
                 android:layout_width="0dp"
                 android:layout_height="44dp"
                 android:layout_weight="1"
-                android:text="💳 Card"
+                android:text="@string/card_payment"
                 android:textColor="#FFFFFF"
                 android:textSize="14sp"
                 android:gravity="center"
@@ -62,7 +62,7 @@
                 android:layout_width="0dp"
                 android:layout_height="44dp"
                 android:layout_weight="1"
-                android:text="💵 Cash"
+                android:text="@string/cash_payment"
                 android:textColor="#FFFFFF"
                 android:textSize="14sp"
                 android:gravity="center"
@@ -75,7 +75,7 @@
         <TextView
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
-            android:text="Delivery Method"
+            android:text="@string/delivery_method"
             android:textColor="#00D4FF"
             android:textSize="14sp"
             android:textStyle="bold"
@@ -103,7 +103,7 @@
                 <TextView
                     android:layout_width="wrap_content"
                     android:layout_height="wrap_content"
-                    android:text="📦 Standard"
+                    android:text="@string/standard_delivery"
                     android:textColor="#FFFFFF"
                     android:textSize="13sp"
                     android:textStyle="bold"/>
@@ -111,7 +111,7 @@
                 <TextView
                     android:layout_width="wrap_content"
                     android:layout_height="wrap_content"
-                    android:text="3-5 days"
+                    android:text="@string/days_3_5"
                     android:textColor="#AAFFFFFF"
                     android:textSize="11sp"/>
 
@@ -132,7 +132,7 @@
                 <TextView
                     android:layout_width="wrap_content"
                     android:layout_height="wrap_content"
-                    android:text="⚡ Express"
+                    android:text="@string/express_delivery"
                     android:textColor="#FFFFFF"
                     android:textSize="13sp"
                     android:textStyle="bold"/>
@@ -140,7 +140,7 @@
                 <TextView
                     android:layout_width="wrap_content"
                     android:layout_height="wrap_content"
-                    android:text="1-2 days • $9.99"
+                    android:text="@string/days_1_2"
                     android:textColor="#AAFFFFFF"
                     android:textSize="11sp"/>
 
@@ -204,7 +204,7 @@
             android:id="@+id/btnConfirmOrder"
             android:layout_width="match_parent"
             android:layout_height="56dp"
-            android:text="Confirm Order"
+            android:text="@string/confirm_order"
             android:textSize="16sp"
             android:textStyle="bold"
             android:textColor="#FFFFFF"
