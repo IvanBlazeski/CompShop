@@ -80,18 +80,41 @@ class ProfileActivity : AppCompatActivity() {
     }
     private fun loadStats() {
         val userId = getUserId()
-        val today = java.text.SimpleDateFormat("yyyy-MM-dd", Locale.getDefault()).format(java.util.Date())
+        var totalOrderCount = 0
+        var totalSpentAmount = 0.0
+        var completed = 0
 
-        firestore.collection("orders")
-            .document(today)
-            .collection(userId)
-            .get()
-            .addOnSuccessListener { snapshot ->
-                val orderCount = snapshot.size()
-                val totalSpent = snapshot.documents.sumOf { it.getDouble("totalPrice") ?: 0.0 }
-                binding.tvOrderCount.text = orderCount.toString()
-                binding.tvTotalSpent.text = "$${"%.0f".format(totalSpent)}"
-            }
+        // Генерирај последните 30 дена
+        val sdf = java.text.SimpleDateFormat("yyyy-MM-dd", java.util.Locale.getDefault())
+        val calendar = java.util.Calendar.getInstance()
+        val dates = (0..30).map {
+            val date = sdf.format(calendar.time)
+            calendar.add(java.util.Calendar.DAY_OF_YEAR, -1)
+            date
+        }
+
+        dates.forEach { date ->
+            firestore.collection("orders")
+                .document(date)
+                .collection(userId)
+                .get()
+                .addOnSuccessListener { snapshot ->
+                    totalOrderCount += snapshot.size()
+                    totalSpentAmount += snapshot.documents.sumOf { it.getDouble("totalPrice") ?: 0.0 }
+                    completed++
+                    if (completed == dates.size) {
+                        binding.tvOrderCount.text = totalOrderCount.toString()
+                        binding.tvTotalSpent.text = "$${"%.0f".format(totalSpentAmount)}"
+                    }
+                }
+                .addOnFailureListener {
+                    completed++
+                    if (completed == dates.size) {
+                        binding.tvOrderCount.text = totalOrderCount.toString()
+                        binding.tvTotalSpent.text = "$${"%.0f".format(totalSpentAmount)}"
+                    }
+                }
+        }
     }
 
     private fun setupEdit() {

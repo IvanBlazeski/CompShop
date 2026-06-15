@@ -230,8 +230,7 @@
   </component>
   <component name="ChangeListManager">
     <list default="true" id="e83b81be-802c-4a86-acb7-9582f79cc869" name="Changes" comment="">
-      <change afterPath="$PROJECT_DIR$/app/src/main/res/drawable-night/gradient_bg.xml" afterDir="false" />
-      <change afterPath="$PROJECT_DIR$/app/src/main/res/drawable/gradient_bg_light.xml" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/.idea/workspace.xml" beforeDir="false" afterPath="$PROJECT_DIR$/.idea/workspace.xml" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/app/src/main/java/com/ivan/compshop/ui/profile/ProfileActivity.kt" beforeDir="false" afterPath="$PROJECT_DIR$/app/src/main/java/com/ivan/compshop/ui/profile/ProfileActivity.kt" afterDir="false" />
     </list>
     <option name="SHOW_DIALOG" value="false" />
@@ -327,6 +326,7 @@
       <recent name="C:\Users\Ivan\AndroidStudioProjects\CompShop\app" />
     </key>
     <key name="MoveFile.RECENT_KEYS">
+      <recent name="C:\Users\Ivan\AndroidStudioProjects\CompShop\app\src\main\res\drawable-night" />
       <recent name="C:\Users\Ivan\AndroidStudioProjects\CompShop\app\src\main\res\menu" />
       <recent name="C:\Users\Ivan\AndroidStudioProjects\CompShop\app\src\main\res\drawable" />
     </key>
