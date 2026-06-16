@@ -7,6 +7,7 @@ import android.widget.Toast
 import androidx.appcompat.app.AppCompatActivity
 import androidx.lifecycle.lifecycleScope
 import androidx.recyclerview.widget.GridLayoutManager
+import com.google.firebase.firestore.FirebaseFirestore
 import com.ivan.compshop.CompShopApplication
 import com.ivan.compshop.R
 import com.ivan.compshop.databinding.ActivityHomeBinding
@@ -16,7 +17,6 @@ import com.ivan.compshop.ui.cart.CartActivity
 import com.ivan.compshop.ui.detail.DetailActivity
 import com.ivan.compshop.ui.orders.OrdersActivity
 import com.ivan.compshop.ui.profile.ProfileActivity
-import kotlinx.coroutines.flow.collectLatest
 import kotlinx.coroutines.launch
 
 class HomeActivity : AppCompatActivity() {
@@ -24,11 +24,16 @@ class HomeActivity : AppCompatActivity() {
     private lateinit var binding: ActivityHomeBinding
     private lateinit var adapter: ComputerAdapter
     private val app by lazy { application as CompShopApplication }
+    private val firestore = FirebaseFirestore.getInstance()
+
     private var allComputers = listOf<Computer>()
     private var selectedBrand = "All"
     private var selectedProcessors = mutableSetOf("All")
     private var selectedPriceRanges = mutableSetOf("All")
     private var selectedSorts = mutableSetOf("Default")
+    private var selectedBrandChip: TextView? = null
+    private var personalUnreadCount = 0
+    private var globalUnreadCount = 0
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
@@ -37,7 +42,7 @@ class HomeActivity : AppCompatActivity() {
 
         setupRecyclerView()
         setupSearch()
-        setupChips()
+        setupBrandChips()
         setupBottomNavigation()
         setupCartHeader()
         setupFilterButton()
@@ -49,6 +54,7 @@ class HomeActivity : AppCompatActivity() {
         super.onResume()
         binding.bottomNavigation.selectedItemId = R.id.nav_home
     }
+
     private fun setupRecyclerView() {
         adapter = ComputerAdapter(
             onItemClick = { computer ->
@@ -56,9 +62,7 @@ class HomeActivity : AppCompatActivity() {
                 intent.putExtra("computer_id", computer.id)
                 startActivity(intent)
             },
-            onAddToCart = { computer ->
-                addToCart(computer)
-            }
+            onAddToCart = { computer -> addToCart(computer) }
         )
         val spanCount = if (resources.getBoolean(R.bool.isTablet)) 3 else 2
         binding.rvComputers.layoutManager = GridLayoutManager(this, spanCount)
@@ -66,45 +70,77 @@ class HomeActivity : AppCompatActivity() {
     }
 
     private fun setupSearch() {
-        val searchField = findViewById<android.widget.EditText>(R.id.etSearch)
-        searchField?.addTextChangedListener(object : android.text.TextWatcher {
-            override fun beforeTextChanged(s: CharSequence?, start: Int, count: Int, after: Int) {}
-            override fun onTextChanged(s: CharSequence?, start: Int, before: Int, count: Int) {
-                applyFilters(s.toString())
-            }
-            override fun afterTextChanged(s: android.text.Editable?) {}
-        })
+        findViewById<android.widget.EditText>(R.id.etSearch)
+            ?.addTextChangedListener(object : android.text.TextWatcher {
+                override fun beforeTextChanged(s: CharSequence?, start: Int, count: Int, after: Int) {}
+                override fun onTextChanged(s: CharSequence?, start: Int, before: Int, count: Int) {
+                    applyFilters(s.toString())
+                }
+                override fun afterTextChanged(s: android.text.Editable?) {}
+            })
     }
 
-    private fun setupChips() {
-        val chipAll = findViewById<TextView>(R.id.chipAll)
-        val chipDell = findViewById<TextView>(R.id.chipDell)
-        val chipHp = findViewById<TextView>(R.id.chipHp)
-        val chipLenovo = findViewById<TextView>(R.id.chipLenovo)
-        val chipApple = findViewById<TextView>(R.id.chipApple)
+    private fun setupBrandChips() {
+        val chipAll = binding.chipAll ?: return
+        selectedBrandChip = chipAll
 
-        val allChips = listOf(chipAll, chipDell, chipHp, chipLenovo, chipApple)
-        val brands = listOf("All", "Dell", "HP", "Lenovo", "Apple")
-
-        allChips.forEachIndexed { index, chip ->
-            chip?.setOnClickListener {
-                selectedBrand = brands[index]
-                allChips.forEach { c ->
-                    c?.setBackgroundResource(R.drawable.btn_social_neon)
-                    c?.setTextColor(android.graphics.Color.parseColor("#00D4FF"))
-                }
-                chip.setBackgroundResource(R.drawable.btn_neon_gradient)
-                chip.setTextColor(android.graphics.Color.WHITE)
-                val query = findViewById<android.widget.EditText>(R.id.etSearch)?.text.toString() ?: ""
-                applyFilters(query)
-            }
+        chipAll.setOnClickListener {
+            selectedBrand = "All"
+            selectBrandChip(chipAll)
+            applyFilters(getCurrentQuery())
         }
+
+        firestore.collection("computers")
+            .get()
+            .addOnSuccessListener { snapshot ->
+                val brands = snapshot.documents
+                    .mapNotNull { it.getString("brand") }
+                    .distinct()
+                    .sorted()
+
+                val chipGroup = binding.chipGroup ?: return@addOnSuccessListener
+
+                brands.forEach { brand ->
+                    val chip = TextView(this)
+                    chip.text = brand
+                    chip.setTextColor(android.graphics.Color.parseColor("#00D4FF"))
+                    chip.textSize = 13f
+                    chip.gravity = android.view.Gravity.CENTER
+                    chip.setBackgroundResource(R.drawable.btn_social_neon)
+                    chip.isClickable = true
+                    chip.isFocusable = true
+
+                    val params = android.widget.LinearLayout.LayoutParams(
+                        android.widget.LinearLayout.LayoutParams.WRAP_CONTENT,
+                        dpToPx(36)
+                    )
+                    params.marginEnd = dpToPx(8)
+                    chip.layoutParams = params
+                    chip.setPadding(dpToPx(16), 0, dpToPx(16), 0)
+
+                    chip.setOnClickListener {
+                        selectedBrand = brand
+                        selectBrandChip(chip)
+                        applyFilters(getCurrentQuery())
+                    }
+
+                    chipGroup.addView(chip)
+                }
+            }
+    }
+
+    private fun selectBrandChip(chip: TextView) {
+        selectedBrandChip?.setBackgroundResource(R.drawable.btn_social_neon)
+        selectedBrandChip?.setTextColor(android.graphics.Color.parseColor("#00D4FF"))
+        chip.setBackgroundResource(R.drawable.btn_neon_gradient)
+        chip.setTextColor(android.graphics.Color.WHITE)
+        selectedBrandChip = chip
     }
 
     private fun setupCartHeader() {
         findViewById<android.widget.FrameLayout>(R.id.btnNotification)?.setOnClickListener {
-            val notificationsSheet = com.ivan.compshop.ui.notifications.NotificationsBottomSheet()
-            notificationsSheet.show(supportFragmentManager, "NotificationsBottomSheet")
+            com.ivan.compshop.ui.notifications.NotificationsBottomSheet()
+                .show(supportFragmentManager, "NotificationsBottomSheet")
         }
     }
 
@@ -115,7 +151,7 @@ class HomeActivity : AppCompatActivity() {
     }
 
     private fun showFilterBottomSheet() {
-        val bottomSheet = FilterBottomSheetFragment(
+        FilterBottomSheetFragment(
             selectedProcessors = selectedProcessors,
             selectedPriceRanges = selectedPriceRanges,
             selectedSorts = selectedSorts,
@@ -123,49 +159,30 @@ class HomeActivity : AppCompatActivity() {
                 selectedProcessors = processors.toMutableSet()
                 selectedPriceRanges = priceRanges.toMutableSet()
                 selectedSorts = sorts.toMutableSet()
-                val query = findViewById<android.widget.EditText>(R.id.etSearch)?.text.toString() ?: ""
-                applyFilters(query)
+                applyFilters(getCurrentQuery())
             }
-        )
-        bottomSheet.show(supportFragmentManager, "FilterBottomSheet")
+        ).show(supportFragmentManager, "FilterBottomSheet")
     }
 
     private fun setupBottomNavigation() {
         binding.bottomNavigation.setOnItemSelectedListener { item ->
             when (item.itemId) {
                 R.id.nav_home -> true
-                R.id.nav_cart -> {
-                    startActivity(Intent(this, CartActivity::class.java))
-                    true
-                }
-                R.id.nav_orders -> {
-                    startActivity(Intent(this, OrdersActivity::class.java))
-                    true
-                }
-                R.id.nav_profile -> {
-                    startActivity(Intent(this, ProfileActivity::class.java))
-                    true
-                }
+                R.id.nav_cart -> { startActivity(Intent(this, CartActivity::class.java)); true }
+                R.id.nav_orders -> { startActivity(Intent(this, OrdersActivity::class.java)); true }
+                R.id.nav_profile -> { startActivity(Intent(this, ProfileActivity::class.java)); true }
                 else -> false
             }
         }
         binding.bottomNavigation.selectedItemId = R.id.nav_home
     }
 
-    private var personalUnreadCount = 0
-    private var globalUnreadCount = 0
-
     private fun observeNotificationCount() {
         val userId = com.google.firebase.auth.FirebaseAuth.getInstance().currentUser?.let {
             if (!it.email.isNullOrEmpty()) it.email else it.uid
         } ?: return
 
-        val firestore = com.google.firebase.firestore.FirebaseFirestore.getInstance()
-
-        // Персонални непрочитани - real-time listener
-        firestore.collection("users")
-            .document(userId)
-            .collection("notifications")
+        firestore.collection("users").document(userId).collection("notifications")
             .addSnapshotListener { snapshot, _ ->
                 personalUnreadCount = snapshot?.documents?.count {
                     it.getBoolean("isRead") == false
@@ -173,13 +190,10 @@ class HomeActivity : AppCompatActivity() {
                 updateBadge(personalUnreadCount + globalUnreadCount)
             }
 
-        // Глобални - real-time listener за и readGlobalNotifications
         firestore.collection("globalNotifications")
             .addSnapshotListener { globalSnapshot, _ ->
                 val globalIds = globalSnapshot?.documents?.map { it.id } ?: emptyList()
-
-                firestore.collection("users")
-                    .document(userId)
+                firestore.collection("users").document(userId)
                     .collection("readGlobalNotifications")
                     .addSnapshotListener { readSnapshot, _ ->
                         val readIds = readSnapshot?.documents?.map { it.id }?.toSet() ?: emptySet()
@@ -190,7 +204,7 @@ class HomeActivity : AppCompatActivity() {
     }
 
     private fun updateBadge(count: Int) {
-        val badge = findViewById<android.widget.TextView>(R.id.tvNotificationBadge)
+        val badge = findViewById<TextView>(R.id.tvNotificationBadge)
         if (count > 0) {
             badge?.visibility = android.view.View.VISIBLE
             badge?.text = count.toString()
@@ -213,6 +227,7 @@ class HomeActivity : AppCompatActivity() {
     private fun applyFilters(query: String) {
         var filtered = allComputers
 
+        // Search
         if (query.isNotEmpty()) {
             filtered = filtered.filter {
                 it.brand.contains(query, ignoreCase = true) ||
@@ -221,20 +236,28 @@ class HomeActivity : AppCompatActivity() {
             }
         }
 
+        // Brand chip
         if (selectedBrand != "All") {
             filtered = filtered.filter {
                 it.brand.contains(selectedBrand, ignoreCase = true)
             }
         }
 
+        // Processor filter
         if (!selectedProcessors.contains("All")) {
             filtered = filtered.filter { computer ->
                 selectedProcessors.any { proc ->
-                    computer.processor.contains(proc, ignoreCase = true)
+                    when (proc) {
+                        "Intel" -> computer.processor.contains("Intel", ignoreCase = true)
+                        "Ryzen" -> computer.processor.contains("Ryzen", ignoreCase = true)
+                        "Apple M" -> computer.processor.contains("Apple M", ignoreCase = true)
+                        else -> computer.processor.contains(proc, ignoreCase = true)
+                    }
                 }
             }
         }
 
+        // Price filter
         val priceFiltered = mutableListOf<Computer>()
         if (selectedPriceRanges.contains("All")) {
             priceFiltered.addAll(filtered)
@@ -248,6 +271,7 @@ class HomeActivity : AppCompatActivity() {
         }
         filtered = priceFiltered.distinctBy { it.id }
 
+        // Sort
         filtered = when (selectedSorts.firstOrNull()) {
             "Lowest price" -> filtered.sortedBy { it.price }
             "Highest price" -> filtered.sortedByDescending { it.price }
@@ -266,6 +290,10 @@ class HomeActivity : AppCompatActivity() {
         adapter.submitList(filtered)
     }
 
+    private fun getCurrentQuery(): String {
+        return findViewById<android.widget.EditText>(R.id.etSearch)?.text.toString() ?: ""
+    }
+
     private fun addToCart(computer: Computer) {
         lifecycleScope.launch {
             val cartItem = CartItem(
@@ -277,11 +305,11 @@ class HomeActivity : AppCompatActivity() {
                 imageUrl = computer.imageUrl
             )
             app.cartRepository.addToCart(cartItem)
-            Toast.makeText(
-                this@HomeActivity,
-                getString(R.string.added_to_cart),
-                Toast.LENGTH_SHORT
-            ).show()
+            Toast.makeText(this@HomeActivity, getString(R.string.added_to_cart), Toast.LENGTH_SHORT).show()
         }
+    }
+
+    private fun dpToPx(dp: Int): Int {
+        return (dp * resources.displayMetrics.density).toInt()
     }
 }

@@ -49,10 +49,10 @@
             android:focusable="true"/>
 
         <TextView
-            android:id="@+id/procI5"
+            android:id="@+id/procIntel"
             android:layout_width="wrap_content"
             android:layout_height="32dp"
-            android:text="Intel i5"
+            android:text="Intel"
             android:textSize="12sp"
             android:gravity="center"
             android:paddingStart="12dp"
@@ -61,33 +61,12 @@
             android:layout_marginEnd="8dp"
             android:clickable="true"
             android:focusable="true"/>
-
-        <TextView
-            android:id="@+id/procI7"
-            android:layout_width="wrap_content"
-            android:layout_height="32dp"
-            android:text="Intel i7"
-            android:textSize="12sp"
-            android:gravity="center"
-            android:paddingStart="12dp"
-            android:paddingEnd="12dp"
-            android:background="@drawable/btn_social_neon"
-            android:clickable="true"
-            android:focusable="true"/>
-
-    </LinearLayout>
-
-    <LinearLayout
-        android:layout_width="match_parent"
-        android:layout_height="wrap_content"
-        android:orientation="horizontal"
-        android:layout_marginBottom="20dp">
 
         <TextView
             android:id="@+id/procRyzen"
             android:layout_width="wrap_content"
             android:layout_height="32dp"
-            android:text="Ryzen 5"
+            android:text="Ryzen"
             android:textSize="12sp"
             android:gravity="center"
             android:paddingStart="12dp"
@@ -98,10 +77,10 @@
             android:focusable="true"/>
 
         <TextView
-            android:id="@+id/procM3"
+            android:id="@+id/procApple"
             android:layout_width="wrap_content"
             android:layout_height="32dp"
-            android:text="Apple M3"
+            android:text="Apple M"
             android:textSize="12sp"
             android:gravity="center"
             android:paddingStart="12dp"

@@ -23,9 +23,7 @@ class FilterBottomSheetFragment(
         inflater: LayoutInflater,
         container: ViewGroup?,
         savedInstanceState: Bundle?
-    ): View {
-        return inflater.inflate(R.layout.fragment_filter_bottom_sheet, container, false)
-    }
+    ): View = inflater.inflate(R.layout.fragment_filter_bottom_sheet, container, false)
 
     override fun onViewCreated(view: View, savedInstanceState: Bundle?) {
         super.onViewCreated(view, savedInstanceState)
@@ -38,11 +36,11 @@ class FilterBottomSheetFragment(
     private fun setupProcessorFilters(view: View) {
         val processors = listOf(
             view.findViewById<TextView>(R.id.procAll) to "All",
-            view.findViewById<TextView>(R.id.procI5) to "Intel Core i5",
-            view.findViewById<TextView>(R.id.procI7) to "Intel Core i7",
-            view.findViewById<TextView>(R.id.procRyzen) to "Ryzen 5",
-            view.findViewById<TextView>(R.id.procM3) to "Apple M3"
+            view.findViewById<TextView>(R.id.procIntel) to "Intel",
+            view.findViewById<TextView>(R.id.procRyzen) to "Ryzen",
+            view.findViewById<TextView>(R.id.procApple) to "Apple M"
         )
+
         processors.forEach { (tv, value) ->
             updateFilterStyle(tv, currentProcessors.contains(value))
             tv?.setOnClickListener {
