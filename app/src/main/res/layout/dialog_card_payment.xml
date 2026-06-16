@@ -86,7 +86,7 @@
                 android:layout_width="match_parent"
                 android:layout_height="match_parent"
                 android:hint="@string/expiry_hint"
-                android:inputType="number"
+                android:inputType="phone"
                 android:maxLength="5"
                 android:textColor="#FFFFFF"
                 android:textColorHint="#73FFFFFF"

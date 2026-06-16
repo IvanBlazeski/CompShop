@@ -13,6 +13,7 @@ import com.ivan.compshop.CompShopApplication
 import com.ivan.compshop.databinding.ActivityCartBinding
 import kotlinx.coroutines.flow.collectLatest
 import kotlinx.coroutines.launch
+import com.ivan.compshop.R
 
 class CartActivity : AppCompatActivity() {
 
@@ -76,8 +77,8 @@ class CartActivity : AppCompatActivity() {
                 val items = app.cartRepository.getAllItemsList()
                 val total = app.cartRepository.getTotalPriceOnce()
 
-                val checkoutDialog = CheckoutDialog(total) { paymentMethod, deliveryMethod, finalTotal ->
-                    placeOrder(items, paymentMethod, deliveryMethod, finalTotal)
+                val checkoutDialog = CheckoutDialog(total) { paymentMethod, deliveryMethod, finalTotal, address ->
+                    placeOrder(items, paymentMethod, deliveryMethod, finalTotal, address)
                 }
                 checkoutDialog.show(supportFragmentManager, "CheckoutDialog")
             }
@@ -88,7 +89,8 @@ class CartActivity : AppCompatActivity() {
         items: List<com.ivan.compshop.data.local.CartItemEntity>,
         paymentMethod: String,
         deliveryMethod: String,
-        finalTotal: Double
+        finalTotal: Double,
+        address: String
     ) {
         val userId = auth.currentUser?.let {
             when {
@@ -120,10 +122,11 @@ class CartActivity : AppCompatActivity() {
             "totalPrice" to finalTotal,
             "paymentMethod" to paymentMethod,
             "deliveryMethod" to deliveryMethod,
+            "deliveryAddress" to address,
             "status" to status,
             "isPaid" to (paymentMethod == "Card"),
             "trackingStatus" to "placed",
-            "createdAt" to FieldValue.serverTimestamp()
+            "createdAt" to com.google.firebase.firestore.FieldValue.serverTimestamp()
         )
 
         firestore.collection("orders")
@@ -144,12 +147,12 @@ class CartActivity : AppCompatActivity() {
                         "title" to notifTitle,
                         "message" to notifMessage,
                         "isRead" to false,
-                        "createdAt" to FieldValue.serverTimestamp()
+                        "createdAt" to com.google.firebase.firestore.FieldValue.serverTimestamp()
                     ))
 
                 Toast.makeText(
                     this@CartActivity,
-                    getString(com.ivan.compshop.R.string.order_placed),
+                    getString(R.string.order_placed),
                     Toast.LENGTH_SHORT
                 ).show()
 

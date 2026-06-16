@@ -28,6 +28,7 @@
             android:layout_gravity="center"
             android:layout_marginBottom="20dp"/>
 
+        <!-- Payment Method -->
         <TextView
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
@@ -72,6 +73,7 @@
 
         </LinearLayout>
 
+        <!-- Delivery Method -->
         <TextView
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
@@ -148,6 +150,128 @@
 
         </LinearLayout>
 
+        <!-- Delivery Address -->
+        <TextView
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:text="@string/delivery_address"
+            android:textColor="#00D4FF"
+            android:textSize="14sp"
+            android:textStyle="bold"
+            android:layout_marginBottom="10dp"/>
+
+        <LinearLayout
+            android:layout_width="match_parent"
+            android:layout_height="56dp"
+            android:orientation="horizontal"
+            android:gravity="center_vertical"
+            android:background="@drawable/input_neon"
+            android:paddingStart="16dp"
+            android:paddingEnd="16dp"
+            android:layout_marginBottom="20dp">
+
+            <EditText
+                android:id="@+id/etDeliveryAddress"
+                android:layout_width="match_parent"
+                android:layout_height="match_parent"
+                android:hint="@string/address_hint"
+                android:inputType="textPostalAddress"
+                android:textColor="#FFFFFF"
+                android:textColorHint="#73FFFFFF"
+                android:background="@android:color/transparent"
+                android:textSize="15sp"/>
+
+        </LinearLayout>
+
+        <!-- Contact Phone -->
+        <TextView
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:text="📞 Contact Phone"
+            android:textColor="#00D4FF"
+            android:textSize="14sp"
+            android:textStyle="bold"
+            android:layout_marginBottom="10dp"/>
+
+        <LinearLayout
+            android:layout_width="match_parent"
+            android:layout_height="56dp"
+            android:orientation="horizontal"
+            android:gravity="center_vertical"
+            android:background="@drawable/input_neon"
+            android:paddingStart="16dp"
+            android:paddingEnd="16dp"
+            android:layout_marginBottom="20dp">
+
+            <EditText
+                android:id="@+id/etContactPhone"
+                android:layout_width="match_parent"
+                android:layout_height="match_parent"
+                android:hint="Enter phone number"
+                android:inputType="phone"
+                android:textColor="#FFFFFF"
+                android:textColorHint="#73FFFFFF"
+                android:background="@android:color/transparent"
+                android:textSize="15sp"/>
+
+        </LinearLayout>
+        <!-- Coupon Code -->
+        <TextView
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:text="@string/coupon_code"
+            android:textColor="#00D4FF"
+            android:textSize="14sp"
+            android:textStyle="bold"
+            android:layout_marginBottom="10dp"/>
+
+        <LinearLayout
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:orientation="horizontal"
+            android:layout_marginBottom="20dp">
+
+            <LinearLayout
+                android:layout_width="0dp"
+                android:layout_height="56dp"
+                android:layout_weight="1"
+                android:gravity="center_vertical"
+                android:background="@drawable/input_neon"
+                android:paddingStart="16dp"
+                android:paddingEnd="16dp"
+                android:layout_marginEnd="8dp">
+
+                <EditText
+                    android:id="@+id/etCouponCode"
+                    android:layout_width="match_parent"
+                    android:layout_height="match_parent"
+                    android:hint="@string/coupon_hint"
+                    android:inputType="textCapCharacters"
+                    android:textColor="#FFFFFF"
+                    android:textColorHint="#73FFFFFF"
+                    android:background="@android:color/transparent"
+                    android:textSize="15sp"/>
+
+            </LinearLayout>
+
+            <TextView
+                android:id="@+id/btnApplyCoupon"
+                android:layout_width="wrap_content"
+                android:layout_height="56dp"
+                android:text="@string/apply_coupon"
+                android:textColor="#FFFFFF"
+                android:textSize="14sp"
+                android:textStyle="bold"
+                android:gravity="center"
+                android:paddingStart="16dp"
+                android:paddingEnd="16dp"
+                android:background="@drawable/btn_neon_gradient"
+                android:clickable="true"
+                android:focusable="true"/>
+
+        </LinearLayout>
+
+        <!-- Summary -->
         <LinearLayout
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
@@ -173,6 +297,16 @@
                 android:textColor="#AAFFFFFF"
                 android:textSize="14sp"
                 android:layout_marginBottom="4dp"/>
+
+            <TextView
+                android:id="@+id/tvDiscount"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:text="Discount: -$0.00"
+                android:textColor="#00E5FF"
+                android:textSize="14sp"
+                android:layout_marginBottom="4dp"
+                android:visibility="gone"/>
 
             <TextView
                 android:id="@+id/tvDeliveryDays"

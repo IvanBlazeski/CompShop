@@ -92,6 +92,20 @@
     <string name="expiry_hint">MM/GG</string>
     <string name="cvv_hint">CVV</string>
     <string name="pay_now">Плати сега</string>
+    <string name="delivery_address">Адреса за испорака</string>
+    <string name="address_hint">Внесете адреса за испорака</string>
+    <string name="coupon_code">Купон код</string>
+    <string name="coupon_hint">Внесете купон код</string>
+    <string name="apply_coupon">Примени</string>
+    <string name="coupon_applied">Купонот е применет!</string>
+    <string name="coupon_invalid">Невалиден купон код</string>
+    <string name="discount">Попуст</string>
+
+    <!-- values-mk/strings.xml -->
+    <string name="contact_phone">📞 Контакт телефон</string>
+    <string name="phone_hint">Внесете телефонски број</string>
+    <string name="please_enter_phone">Внесете контакт телефон</string>
+    <string name="please_enter_address">Внесете адреса за испорака</string>
 
     <!-- Orders -->
     <string name="orders">Нарачки</string>

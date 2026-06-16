@@ -6,130 +6,151 @@ import android.view.View
 import android.view.ViewGroup
 import android.widget.Button
 import android.widget.EditText
-import android.widget.LinearLayout
 import android.widget.TextView
 import android.widget.Toast
-import com.google.android.material.bottomsheet.BottomSheetDialogFragment
+import androidx.fragment.app.DialogFragment
 import com.ivan.compshop.R
 
 class CheckoutDialog(
-    private val totalPrice: Double,
-    private val onConfirm: (paymentMethod: String, deliveryMethod: String, finalTotal: Double) -> Unit
-) : BottomSheetDialogFragment() {
+    private val orderTotal: Double,
+    private val onConfirm: (paymentMethod: String, deliveryMethod: String, finalTotal: Double, address: String) -> Unit
+) : DialogFragment() {
 
     private var selectedPayment = "Card"
     private var selectedDelivery = "Standard"
+    private var discountPercent = 0.0
+
+    // Валидни купони
+    private val validCoupons = mapOf(
+        "COMPSHOP10" to 10.0,
+        "SAVE20" to 20.0,
+        "WELCOME15" to 15.0
+    )
 
     override fun onCreateView(
-        inflater: LayoutInflater,
-        container: ViewGroup?,
+        inflater: LayoutInflater, container: ViewGroup?,
         savedInstanceState: Bundle?
-    ): View {
-        return inflater.inflate(R.layout.dialog_checkout, container, false)
+    ): View? = inflater.inflate(R.layout.dialog_checkout, container, false)
+
+    override fun onStart() {
+        super.onStart()
+        dialog?.window?.setLayout(
+            ViewGroup.LayoutParams.MATCH_PARENT,
+            ViewGroup.LayoutParams.WRAP_CONTENT
+        )
+        dialog?.window?.setBackgroundDrawableResource(android.R.color.transparent)
     }
 
     override fun onViewCreated(view: View, savedInstanceState: Bundle?) {
         super.onViewCreated(view, savedInstanceState)
 
+        val btnPayCard = view.findViewById<TextView>(R.id.btnPayCard)
+        val btnPayCash = view.findViewById<TextView>(R.id.btnPayCash)
+        val btnDeliveryStandard = view.findViewById<ViewGroup>(R.id.btnDeliveryStandard)
+        val btnDeliveryExpress = view.findViewById<ViewGroup>(R.id.btnDeliveryExpress)
         val tvOrderTotal = view.findViewById<TextView>(R.id.tvOrderTotal)
         val tvDeliveryFee = view.findViewById<TextView>(R.id.tvDeliveryFee)
-        val tvFinalTotal = view.findViewById<TextView>(R.id.tvFinalTotal)
         val tvDeliveryDays = view.findViewById<TextView>(R.id.tvDeliveryDays)
+        val tvDiscount = view.findViewById<TextView>(R.id.tvDiscount)
+        val tvFinalTotal = view.findViewById<TextView>(R.id.tvFinalTotal)
         val btnConfirm = view.findViewById<Button>(R.id.btnConfirmOrder)
-        val btnCard = view.findViewById<TextView>(R.id.btnPayCard)
-        val btnCash = view.findViewById<TextView>(R.id.btnPayCash)
-        val btnStandard = view.findViewById<LinearLayout>(R.id.btnDeliveryStandard)
-        val btnExpress = view.findViewById<LinearLayout>(R.id.btnDeliveryExpress)
+        val etDeliveryAddress = view.findViewById<EditText>(R.id.etDeliveryAddress)
+        val etCouponCode = view.findViewById<EditText>(R.id.etCouponCode)
+        val btnApplyCoupon = view.findViewById<TextView>(R.id.btnApplyCoupon)
+        val etContactPhone = view.findViewById<EditText>(R.id.etContactPhone)
 
-        fun getDeliveryFee() = when (selectedDelivery) {
-            "Express" -> 9.99
-            else -> if (totalPrice >= 1000) 0.0 else 4.99
-        }
+        tvOrderTotal.text = "Order total: $${"%.2f".format(orderTotal)}"
 
-        fun updateTotals() {
-            val fee = getDeliveryFee()
-            val days = if (selectedDelivery == "Express") "1-2 days" else "3-5 days"
-            tvOrderTotal?.text = "Order total: $${"%.2f".format(totalPrice)}"
-            tvDeliveryFee?.text = if (fee == 0.0) "Delivery: FREE 🎉" else "Delivery: $${"%.2f".format(fee)}"
-            tvFinalTotal?.text = "Total: $${"%.2f".format(totalPrice + fee)}"
-            tvDeliveryDays?.text = "Estimated delivery: $days"
-        }
+        fun updateTotal() {
+            val deliveryFee = if (selectedDelivery == "Express") 9.99 else if (orderTotal >= 1000) 0.0 else 0.0
+            val discount = orderTotal * (discountPercent / 100)
+            val finalTotal = orderTotal + deliveryFee - discount
 
-        fun updatePaymentStyle() {
-            btnCard?.setBackgroundResource(if (selectedPayment == "Card") R.drawable.btn_neon_gradient else R.drawable.btn_social_neon)
-            btnCash?.setBackgroundResource(if (selectedPayment == "Cash on delivery") R.drawable.btn_neon_gradient else R.drawable.btn_social_neon)
-        }
+            tvDeliveryFee.text = "Delivery: $${"%.2f".format(deliveryFee)}"
+            tvDeliveryDays.text = if (selectedDelivery == "Express") "Estimated delivery: 1-2 days"
+            else "Estimated delivery: 3-5 days"
 
-        fun updateDeliveryStyle() {
-            btnStandard?.setBackgroundResource(if (selectedDelivery == "Standard") R.drawable.btn_neon_gradient else R.drawable.btn_social_neon)
-            btnExpress?.setBackgroundResource(if (selectedDelivery == "Express") R.drawable.btn_neon_gradient else R.drawable.btn_social_neon)
-        }
-
-        updateTotals()
-        updatePaymentStyle()
-        updateDeliveryStyle()
-
-        btnCard?.setOnClickListener { selectedPayment = "Card"; updatePaymentStyle() }
-        btnCash?.setOnClickListener { selectedPayment = "Cash on delivery"; updatePaymentStyle() }
-        btnStandard?.setOnClickListener { selectedDelivery = "Standard"; updateTotals(); updateDeliveryStyle() }
-        btnExpress?.setOnClickListener { selectedDelivery = "Express"; updateTotals(); updateDeliveryStyle() }
-
-        btnConfirm?.setOnClickListener {
-            val finalTotal = totalPrice + getDeliveryFee()
-            if (selectedPayment == "Card") {
-                showCardForm(finalTotal)
+            if (discountPercent > 0) {
+                tvDiscount.visibility = View.VISIBLE
+                tvDiscount.text = "Discount (${discountPercent.toInt()}%): -$${"%.2f".format(discount)}"
             } else {
-                onConfirm(selectedPayment, selectedDelivery, finalTotal)
-                dismiss()
+                tvDiscount.visibility = View.GONE
+            }
+
+            tvFinalTotal.text = "Total: $${"%.2f".format(finalTotal)}"
+        }
+
+        updateTotal()
+
+        // Payment
+        btnPayCard.setOnClickListener {
+            selectedPayment = "Card"
+            btnPayCard.setBackgroundResource(R.drawable.btn_neon_gradient)
+            btnPayCash.setBackgroundResource(R.drawable.btn_social_neon)
+        }
+
+        btnPayCash.setOnClickListener {
+            selectedPayment = "Cash on delivery"
+            btnPayCash.setBackgroundResource(R.drawable.btn_neon_gradient)
+            btnPayCard.setBackgroundResource(R.drawable.btn_social_neon)
+        }
+
+        // Delivery
+        btnDeliveryStandard.setOnClickListener {
+            selectedDelivery = "Standard"
+            btnDeliveryStandard.setBackgroundResource(R.drawable.btn_neon_gradient)
+            btnDeliveryExpress.setBackgroundResource(R.drawable.btn_social_neon)
+            updateTotal()
+        }
+
+        btnDeliveryExpress.setOnClickListener {
+            selectedDelivery = "Express"
+            btnDeliveryExpress.setBackgroundResource(R.drawable.btn_neon_gradient)
+            btnDeliveryStandard.setBackgroundResource(R.drawable.btn_social_neon)
+            updateTotal()
+        }
+
+        // Coupon
+        btnApplyCoupon.setOnClickListener {
+            val code = etCouponCode.text.toString().trim().uppercase()
+            val discount = validCoupons[code]
+            if (discount != null) {
+                discountPercent = discount
+                Toast.makeText(requireContext(), getString(R.string.coupon_applied), Toast.LENGTH_SHORT).show()
+                updateTotal()
+            } else {
+                Toast.makeText(requireContext(), getString(R.string.coupon_invalid), Toast.LENGTH_SHORT).show()
             }
         }
-    }
 
-    private fun showCardForm(finalTotal: Double) {
-        val dialog = android.app.AlertDialog.Builder(requireContext()).create()
-        val cardView = layoutInflater.inflate(R.layout.dialog_card_payment, null)
-        dialog.setView(cardView)
-        dialog.window?.setBackgroundDrawableResource(android.R.color.transparent)
+        // Confirm
+        btnConfirm.setOnClickListener {
+            val address = etDeliveryAddress.text.toString().trim()
+            val phone = etContactPhone.text.toString().trim()
 
-        val btnPay = cardView.findViewById<Button>(R.id.btnPay)
-        val etCardNumber = cardView.findViewById<EditText>(R.id.etCardNumber)
-        val etExpiry = cardView.findViewById<EditText>(R.id.etExpiry)
-        val etCvv = cardView.findViewById<EditText>(R.id.etCvv)
-        val etCardName = cardView.findViewById<EditText>(R.id.etCardName)
-
-        etExpiry?.addTextChangedListener(object : android.text.TextWatcher {
-            private var isFormatting = false
-            override fun beforeTextChanged(s: CharSequence?, start: Int, count: Int, after: Int) {}
-            override fun afterTextChanged(s: android.text.Editable?) {}
-            override fun onTextChanged(s: CharSequence?, start: Int, before: Int, count: Int) {
-                if (isFormatting) return
-                isFormatting = true
-                val clean = s.toString().replace("/", "")
-                val formatted = if (clean.length >= 2) {
-                    "${clean.substring(0, 2)}/${clean.substring(2)}"
-                } else clean
-                etExpiry?.setText(formatted)
-                etExpiry?.setSelection(formatted.length)
-                isFormatting = false
+            if (address.isEmpty()) {
+                Toast.makeText(requireContext(), getString(R.string.please_enter_address), Toast.LENGTH_SHORT).show()
+                return@setOnClickListener
             }
-        })
-
-        btnPay?.setOnClickListener {
-            val cardNumber = etCardNumber?.text.toString().trim()
-            val expiry = etExpiry?.text.toString().trim()
-            val cvv = etCvv?.text.toString().trim()
-            val name = etCardName?.text.toString().trim()
-
-            if (cardNumber.length < 16 || expiry.isEmpty() || cvv.length < 3 || name.isEmpty()) {
-                Toast.makeText(requireContext(), "Please fill in all card details", Toast.LENGTH_SHORT).show()
+            if (phone.isEmpty()) {
+                Toast.makeText(requireContext(), getString(R.string.please_enter_phone), Toast.LENGTH_SHORT).show()
                 return@setOnClickListener
             }
 
-            dialog.dismiss()
-            onConfirm("Card", selectedDelivery, finalTotal)
-            dismiss()
-        }
+            val deliveryFee = if (selectedDelivery == "Express") 9.99 else if (orderTotal >= 1000) 0.0 else 0.0
+            val discount = orderTotal * (discountPercent / 100)
+            val finalTotal = orderTotal + deliveryFee - discount
 
-        dialog.show()
+            if (selectedPayment == "Card") {
+                val cardDialog = CardPaymentDialog(finalTotal) {
+                    onConfirm(selectedPayment, selectedDelivery, finalTotal, "$address | $phone")
+                    dismiss()
+                }
+                cardDialog.show(parentFragmentManager, "CardPaymentDialog")
+            } else {
+                onConfirm(selectedPayment, selectedDelivery, finalTotal, "$address | $phone")
+                dismiss()
+            }
+        }
     }
 }

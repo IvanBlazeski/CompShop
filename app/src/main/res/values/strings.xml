@@ -92,6 +92,20 @@
     <string name="expiry_hint">MM/YY</string>
     <string name="cvv_hint">CVV</string>
     <string name="pay_now">Pay Now</string>
+    <string name="delivery_address">Delivery Address</string>
+    <string name="address_hint">Enter your delivery address</string>
+    <string name="coupon_code">Coupon Code</string>
+    <string name="coupon_hint">Enter coupon code</string>
+    <string name="apply_coupon">Apply</string>
+    <string name="coupon_applied">Coupon applied!</string>
+    <string name="coupon_invalid">Invalid coupon code</string>
+    <string name="discount">Discount</string>
+
+    <!-- values/strings.xml -->
+    <string name="contact_phone">📞 Contact Phone</string>
+    <string name="phone_hint">Enter phone number</string>
+    <string name="please_enter_phone">Please enter contact phone</string>
+    <string name="please_enter_address">Please enter delivery address</string>
 
     <!-- Orders -->
     <string name="orders">Orders</string>
