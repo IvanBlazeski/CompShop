@@ -13,7 +13,21 @@ class ComputerRepository {
         return try {
             val snapshot = computersCollection.get().await()
             snapshot.documents.mapNotNull { doc ->
-                doc.toObject(Computer::class.java)?.copy(id = doc.id)
+                val qty = (doc.getLong("quantity") ?: 0).toInt()
+                Computer(
+                    id = doc.id,
+                    brand = doc.getString("brand") ?: "",
+                    model = doc.getString("model") ?: "",
+                    processor = doc.getString("processor") ?: "",
+                    ram = doc.getString("ram") ?: "",
+                    storage = doc.getString("storage") ?: "",
+                    graphics = doc.getString("graphics") ?: "",
+                    price = doc.getDouble("price") ?: 0.0,
+                    imageUrl = doc.getString("imageUrl") ?: "",
+                    description = doc.getString("description") ?: "",
+                    quantity = qty,
+                    inStock = qty > 0
+                )
             }
         } catch (e: Exception) {
             emptyList()
@@ -23,7 +37,21 @@ class ComputerRepository {
     suspend fun getComputerById(id: String): Computer? {
         return try {
             val doc = computersCollection.document(id).get().await()
-            doc.toObject(Computer::class.java)?.copy(id = doc.id)
+            val qty = (doc.getLong("quantity") ?: 0).toInt()
+            Computer(
+                id = doc.id,
+                brand = doc.getString("brand") ?: "",
+                model = doc.getString("model") ?: "",
+                processor = doc.getString("processor") ?: "",
+                ram = doc.getString("ram") ?: "",
+                storage = doc.getString("storage") ?: "",
+                graphics = doc.getString("graphics") ?: "",
+                price = doc.getDouble("price") ?: 0.0,
+                imageUrl = doc.getString("imageUrl") ?: "",
+                description = doc.getString("description") ?: "",
+                quantity = qty,
+                inStock = qty > 0
+            )
         } catch (e: Exception) {
             null
         }

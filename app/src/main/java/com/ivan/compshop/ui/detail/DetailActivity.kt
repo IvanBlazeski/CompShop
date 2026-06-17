@@ -5,10 +5,12 @@ import android.widget.Toast
 import androidx.appcompat.app.AppCompatActivity
 import androidx.lifecycle.lifecycleScope
 import com.bumptech.glide.Glide
+import com.google.firebase.firestore.FirebaseFirestore
 import com.ivan.compshop.CompShopApplication
 import com.ivan.compshop.R
 import com.ivan.compshop.databinding.ActivityDetailBinding
 import com.ivan.compshop.model.CartItem
+import com.ivan.compshop.model.Computer
 import kotlinx.coroutines.launch
 
 class DetailActivity : AppCompatActivity() {
@@ -34,28 +36,45 @@ class DetailActivity : AppCompatActivity() {
     }
 
     private fun loadComputer(computerId: String) {
-        lifecycleScope.launch {
-            val computer = app.computerRepository.getComputerById(computerId)
+        FirebaseFirestore.getInstance()
+            .collection("computers")
+            .document(computerId)
+            .addSnapshotListener { doc, _ ->
+                if (doc == null) return@addSnapshotListener
 
-            computer?.let {
-                binding.tvBrand.text = it.brand
-                binding.tvModel.text = it.model
-                binding.tvPrice.text = "$${it.price}"
-                binding.tvProcessor.text = it.processor
-                binding.tvRam.text = it.ram
-                binding.tvStorage.text = it.storage
-                binding.tvGraphics.text = it.graphics
-                binding.tvDescription.text = it.description
+                val qty = (doc.getLong("quantity") ?: 0).toInt()
+                val computer = Computer(
+                    id = doc.id,
+                    brand = doc.getString("brand") ?: "",
+                    model = doc.getString("model") ?: "",
+                    processor = doc.getString("processor") ?: "",
+                    ram = doc.getString("ram") ?: "",
+                    storage = doc.getString("storage") ?: "",
+                    graphics = doc.getString("graphics") ?: "",
+                    price = doc.getDouble("price") ?: 0.0,
+                    imageUrl = doc.getString("imageUrl") ?: "",
+                    description = doc.getString("description") ?: "",
+                    quantity = qty,
+                    inStock = qty > 0
+                )
 
-                if (it.imageUrl.isNotEmpty()) {
+                binding.tvBrand.text = computer.brand
+                binding.tvModel.text = computer.model
+                binding.tvPrice.text = "$${computer.price}"
+                binding.tvProcessor.text = computer.processor
+                binding.tvRam.text = computer.ram
+                binding.tvStorage.text = computer.storage
+                binding.tvGraphics.text = computer.graphics
+                binding.tvDescription.text = computer.description
+
+                if (computer.imageUrl.isNotEmpty()) {
                     Glide.with(this@DetailActivity)
-                        .load(it.imageUrl)
+                        .load(computer.imageUrl)
                         .placeholder(android.R.drawable.ic_menu_gallery)
                         .into(binding.ivComputer)
                 }
 
-                // Favorite
-                binding.ivFavoriteDetail.setOnClickListener { _ ->
+                binding.ivFavoriteDetail.setOnClickListener {
                     isFavorite = !isFavorite
                     binding.ivFavoriteDetail.setImageResource(
                         if (isFavorite) android.R.drawable.btn_star_big_on
@@ -67,9 +86,9 @@ class DetailActivity : AppCompatActivity() {
                     )
                 }
 
-                // Stock management
-                maxQuantity = it.quantity
-                if (!it.inStock || it.quantity <= 0) {
+                // Stock
+                maxQuantity = qty
+                if (qty <= 0) {
                     binding.btnAddToCart.isEnabled = false
                     binding.btnBuyNow.isEnabled = false
                     binding.btnAddToCart.text = "⛔ Out of Stock"
@@ -85,7 +104,6 @@ class DetailActivity : AppCompatActivity() {
                     binding.btnPlus.isEnabled = true
                 }
 
-                // Quantity
                 binding.tvQuantity.text = currentQuantity.toString()
 
                 binding.btnPlus.setOnClickListener {
@@ -104,7 +122,6 @@ class DetailActivity : AppCompatActivity() {
                     }
                 }
 
-                // Add to Cart
                 binding.btnAddToCart.setOnClickListener {
                     lifecycleScope.launch {
                         val cartItem = CartItem(
@@ -124,11 +141,9 @@ class DetailActivity : AppCompatActivity() {
                     }
                 }
 
-                // Buy Now
                 binding.btnBuyNow.setOnClickListener {
                     Toast.makeText(this@DetailActivity, "Proceeding to checkout...", Toast.LENGTH_SHORT).show()
                 }
             }
-        }
     }
 }

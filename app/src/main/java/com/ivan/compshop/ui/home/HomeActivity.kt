@@ -225,6 +225,7 @@ class HomeActivity : AppCompatActivity() {
                 if (snapshot == null) return@addSnapshotListener
                 allComputers = snapshot.documents.mapNotNull { doc ->
                     try {
+                        val qty = (doc.getLong("quantity") ?: 0).toInt()
                         Computer(
                             id = doc.id,
                             brand = doc.getString("brand") ?: "",
@@ -236,8 +237,8 @@ class HomeActivity : AppCompatActivity() {
                             price = doc.getDouble("price") ?: 0.0,
                             imageUrl = doc.getString("imageUrl") ?: "",
                             description = doc.getString("description") ?: "",
-                            inStock = doc.getBoolean("inStock") ?: true,
-                            quantity = (doc.getLong("quantity") ?: 0).toInt()
+                            quantity = qty,
+                            inStock = qty > 0  // ← секогаш од quantity!
                         )
                     } catch (e: Exception) { null }
                 }
