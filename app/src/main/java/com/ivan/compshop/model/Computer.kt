@@ -11,5 +11,6 @@ data class Computer(
     val price: Double = 0.0,
     val imageUrl: String = "",
     val inStock: Boolean = true,
-    val description: String = ""
+    val description: String = "",
+    val quantity: Int = 0
 )

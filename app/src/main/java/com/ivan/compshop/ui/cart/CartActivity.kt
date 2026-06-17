@@ -158,6 +158,19 @@ class CartActivity : AppCompatActivity() {
 
                 lifecycleScope.launch {
                     app.cartRepository.clearCart()
+                    // Намали залихата во Firestore
+                    items.forEach { item ->
+                        val computerRef = firestore.collection("computers").document(item.computerId)
+                        firestore.runTransaction { transaction ->
+                            val doc = transaction.get(computerRef)
+                            val currentQty = (doc.getLong("quantity") ?: 0).toInt()
+                            val newQty = (currentQty - item.quantity).coerceAtLeast(0)
+                            transaction.update(computerRef, mapOf(
+                                "quantity" to newQty,
+                                "inStock" to (newQty > 0)
+                            ))
+                        }
+                    }
                 }
             }
             .addOnFailureListener { e ->

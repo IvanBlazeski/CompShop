@@ -16,7 +16,8 @@ class DetailActivity : AppCompatActivity() {
     private lateinit var binding: ActivityDetailBinding
     private val app by lazy { application as CompShopApplication }
     private var isFavorite = false
-    private var quantity = 1
+    private var currentQuantity = 1
+    private var maxQuantity = 0
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
@@ -29,24 +30,7 @@ class DetailActivity : AppCompatActivity() {
             onBackPressedDispatcher.onBackPressed()
         }
 
-        setupQuantitySelector()
         loadComputer(computerId)
-    }
-
-    private fun setupQuantitySelector() {
-        binding.tvQuantity.text = quantity.toString()
-
-        binding.btnMinus.setOnClickListener {
-            if (quantity > 1) {
-                quantity--
-                binding.tvQuantity.text = quantity.toString()
-            }
-        }
-
-        binding.btnPlus.setOnClickListener {
-            quantity++
-            binding.tvQuantity.text = quantity.toString()
-        }
     }
 
     private fun loadComputer(computerId: String) {
@@ -83,23 +67,58 @@ class DetailActivity : AppCompatActivity() {
                     )
                 }
 
+                // Stock management
+                maxQuantity = it.quantity
+                if (!it.inStock || it.quantity <= 0) {
+                    binding.btnAddToCart.isEnabled = false
+                    binding.btnBuyNow.isEnabled = false
+                    binding.btnAddToCart.text = "⛔ Out of Stock"
+                    binding.btnAddToCart.alpha = 0.5f
+                    binding.btnBuyNow.alpha = 0.5f
+                    binding.btnMinus.isEnabled = false
+                    binding.btnPlus.isEnabled = false
+                } else {
+                    binding.btnAddToCart.text = getString(R.string.add_to_cart)
+                    binding.btnAddToCart.isEnabled = true
+                    binding.btnBuyNow.isEnabled = true
+                    binding.btnMinus.isEnabled = true
+                    binding.btnPlus.isEnabled = true
+                }
+
+                // Quantity
+                binding.tvQuantity.text = currentQuantity.toString()
+
+                binding.btnPlus.setOnClickListener {
+                    if (currentQuantity < maxQuantity) {
+                        currentQuantity++
+                        binding.tvQuantity.text = currentQuantity.toString()
+                    } else {
+                        Toast.makeText(this@DetailActivity, "Max: $maxQuantity", Toast.LENGTH_SHORT).show()
+                    }
+                }
+
+                binding.btnMinus.setOnClickListener {
+                    if (currentQuantity > 1) {
+                        currentQuantity--
+                        binding.tvQuantity.text = currentQuantity.toString()
+                    }
+                }
+
                 // Add to Cart
                 binding.btnAddToCart.setOnClickListener {
                     lifecycleScope.launch {
-                        repeat(quantity) {
-                            val cartItem = CartItem(
-                                computerId = computer.id,
-                                computerName = computer.model,
-                                computerBrand = computer.brand,
-                                price = computer.price,
-                                quantity = 1,
-                                imageUrl = computer.imageUrl
-                            )
-                            app.cartRepository.addToCart(cartItem)
-                        }
+                        val cartItem = CartItem(
+                            computerId = computer.id,
+                            computerName = computer.model,
+                            computerBrand = computer.brand,
+                            price = computer.price,
+                            quantity = currentQuantity,
+                            imageUrl = computer.imageUrl
+                        )
+                        app.cartRepository.addToCart(cartItem)
                         Toast.makeText(
                             this@DetailActivity,
-                            "${quantity}x ${computer.model} ${getString(R.string.added_to_cart)}",
+                            "${currentQuantity}x ${computer.model} ${getString(R.string.added_to_cart)}",
                             Toast.LENGTH_SHORT
                         ).show()
                     }
@@ -107,11 +126,7 @@ class DetailActivity : AppCompatActivity() {
 
                 // Buy Now
                 binding.btnBuyNow.setOnClickListener {
-                    Toast.makeText(
-                        this@DetailActivity,
-                        "Proceeding to checkout...",
-                        Toast.LENGTH_SHORT
-                    ).show()
+                    Toast.makeText(this@DetailActivity, "Proceeding to checkout...", Toast.LENGTH_SHORT).show()
                 }
             }
         }

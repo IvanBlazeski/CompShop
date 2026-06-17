@@ -162,16 +162,26 @@ class NotificationsBottomSheet : BottomSheetDialogFragment() {
 
     private fun createNotificationItem(notification: AppNotification): View {
         val context = requireContext()
-        val item = LinearLayout(context).apply {
-            orientation = LinearLayout.VERTICAL
+        val userId = auth.currentUser?.email ?: auth.currentUser?.uid ?: return View(context)
+
+        // Outer wrapper
+        val wrapper = LinearLayout(context).apply {
+            orientation = LinearLayout.HORIZONTAL
             setBackgroundResource(R.drawable.btn_social_neon)
-            setPadding(48, 40, 48, 40)
+            setPadding(48, 40, 24, 40)
             val params = LinearLayout.LayoutParams(
                 LinearLayout.LayoutParams.MATCH_PARENT,
                 LinearLayout.LayoutParams.WRAP_CONTENT
             )
             params.setMargins(0, 0, 0, 24)
             layoutParams = params
+            gravity = android.view.Gravity.CENTER_VERTICAL
+        }
+
+        // Content
+        val content = LinearLayout(context).apply {
+            orientation = LinearLayout.VERTICAL
+            layoutParams = LinearLayout.LayoutParams(0, LinearLayout.LayoutParams.WRAP_CONTENT, 1f)
         }
 
         if (!notification.isRead) {
@@ -181,7 +191,7 @@ class NotificationsBottomSheet : BottomSheetDialogFragment() {
                 layoutParams = params
                 setBackgroundResource(R.drawable.btn_neon_gradient)
             }
-            item.addView(dot)
+            content.addView(dot)
         }
 
         val tvTitle = TextView(context).apply {
@@ -215,10 +225,43 @@ class NotificationsBottomSheet : BottomSheetDialogFragment() {
             setTextColor(android.graphics.Color.parseColor("#00D4FF"))
         }
 
-        item.addView(tvTitle)
-        item.addView(tvMessage)
-        item.addView(tvTime)
+        content.addView(tvTitle)
+        content.addView(tvMessage)
+        content.addView(tvTime)
 
-        return item
+        // Delete button
+        val btnDelete = TextView(context).apply {
+            text = "✕"
+            textSize = 16f
+            setTextColor(android.graphics.Color.parseColor("#FF4081"))
+            gravity = android.view.Gravity.CENTER
+            val params = LinearLayout.LayoutParams(48, 48)
+            params.setMargins(16, 0, 0, 0)
+            layoutParams = params
+            isClickable = true
+            isFocusable = true
+            setOnClickListener {
+                if (notification.isGlobal) {
+                    // Означи глобалната како прочитана (сокриј ја)
+                    firestore.collection("users")
+                        .document(userId)
+                        .collection("readGlobalNotifications")
+                        .document(notification.id)
+                        .set(mapOf("readAt" to com.google.firebase.firestore.FieldValue.serverTimestamp()))
+                } else {
+                    // Избриши персонална нотификација
+                    firestore.collection("users")
+                        .document(userId)
+                        .collection("notifications")
+                        .document(notification.id)
+                        .delete()
+                }
+            }
+        }
+
+        wrapper.addView(content)
+        wrapper.addView(btnDelete)
+
+        return wrapper
     }
 }

@@ -14,6 +14,7 @@ class OrdersActivity : AppCompatActivity() {
     private lateinit var adapter: OrdersAdapter
     private val firestore = FirebaseFirestore.getInstance()
     private val auth = FirebaseAuth.getInstance()
+    private val previousStatuses = mutableMapOf<String, String>()
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
@@ -22,6 +23,14 @@ class OrdersActivity : AppCompatActivity() {
 
         binding.btnBack.setOnClickListener {
             onBackPressedDispatcher.onBackPressed()
+        }
+
+        // Permission request овде!
+        if (android.os.Build.VERSION.SDK_INT >= android.os.Build.VERSION_CODES.TIRAMISU) {
+            requestPermissions(
+                arrayOf(android.Manifest.permission.POST_NOTIFICATIONS),
+                1001
+            )
         }
 
         setupRecyclerView()
@@ -52,18 +61,13 @@ class OrdersActivity : AppCompatActivity() {
         }
 
         val allOrders = mutableListOf<OrderItem>()
-        var completed = 0
 
         dates.forEach { date ->
             firestore.collection("orders")
                 .document(date)
                 .collection(userId)
                 .addSnapshotListener { snapshot, error ->
-                    if (error != null || snapshot == null) {
-                        completed++
-                        if (completed == dates.size) updateUI(allOrders)
-                        return@addSnapshotListener
-                    }
+                    if (error != null || snapshot == null) return@addSnapshotListener
 
                     val orders = snapshot.documents.mapNotNull { doc ->
                         val itemsList = doc.get("items") as? List<Map<String, Any>> ?: emptyList()
@@ -82,13 +86,47 @@ class OrdersActivity : AppCompatActivity() {
                         )
                     }
 
-                    // Отстрани стари нарачки од овој датум и додај нови
+                    // Tracking нотификација
+                    orders.forEach { order ->
+                        val prev = previousStatuses[order.id]
+                        if (prev != null && prev != order.trackingStatus) {
+                            showTrackingNotification(order)
+                        }
+                        previousStatuses[order.id] = order.trackingStatus
+                    }
+
                     allOrders.removeAll { it.date == date }
                     allOrders.addAll(orders)
                     allOrders.sortByDescending { it.date }
                     updateUI(allOrders)
                 }
         }
+    }
+
+    private fun showTrackingNotification(order: OrderItem) {
+        val statusText = when (order.trackingStatus) {
+            "process" -> "📦 Нарачката е во обработка"
+            "shipped" -> "🚚 Нарачката е испратена"
+            "delivery" -> "🏠 Нарачката е во достава"
+            "done" -> "✅ Нарачката е доставена!"
+            else -> return
+        }
+
+        if (android.os.Build.VERSION.SDK_INT >= android.os.Build.VERSION_CODES.TIRAMISU) {
+            if (checkSelfPermission(android.Manifest.permission.POST_NOTIFICATIONS)
+                != android.content.pm.PackageManager.PERMISSION_GRANTED) return
+        }
+
+        val notification = androidx.core.app.NotificationCompat.Builder(this, "tracking_channel")
+            .setSmallIcon(android.R.drawable.ic_dialog_info)
+            .setContentTitle("📦 Order Update")
+            .setContentText(statusText)
+            .setPriority(androidx.core.app.NotificationCompat.PRIORITY_HIGH)
+            .setAutoCancel(true)
+            .build()
+
+        val manager = getSystemService(android.app.NotificationManager::class.java)
+        manager.notify(order.id.hashCode(), notification)
     }
 
     private fun updateUI(orders: List<OrderItem>) {

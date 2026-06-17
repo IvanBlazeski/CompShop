@@ -1,6 +1,8 @@
 package com.ivan.compshop
 
 import android.app.Application
+import android.app.NotificationChannel
+import android.app.NotificationManager
 import com.google.firebase.analytics.FirebaseAnalytics
 import com.ivan.compshop.data.local.AppDatabase
 import com.ivan.compshop.data.repository.AuthRepository
@@ -37,6 +39,19 @@ class CompShopApplication : Application() {
         val config = android.content.res.Configuration(resources.configuration)
         config.setLocale(locale)
         resources.updateConfiguration(config, resources.displayMetrics)
+
+        // Notification Channel
+        val channel = NotificationChannel(
+            "tracking_channel",
+            "Order Tracking",
+            NotificationManager.IMPORTANCE_HIGH
+        ).apply {
+            description = "Order tracking status updates"
+            enableLights(true)
+            enableVibration(true)
+        }
+        val manager = getSystemService(NotificationManager::class.java)
+        manager.createNotificationChannel(channel)
 
         analytics = FirebaseAnalytics.getInstance(this)
     }

@@ -175,65 +175,6 @@
                     android:clickable="true"
                     android:focusable="true"/>
 
-                <TextView
-                    android:id="@+id/chipDell"
-                    android:layout_width="wrap_content"
-                    android:layout_height="36dp"
-                    android:text="Dell"
-                    android:textColor="#00D4FF"
-                    android:textSize="13sp"
-                    android:gravity="center"
-                    android:paddingStart="16dp"
-                    android:paddingEnd="16dp"
-                    android:background="@drawable/btn_social_neon"
-                    android:layout_marginEnd="8dp"
-                    android:clickable="true"
-                    android:focusable="true"/>
-
-                <TextView
-                    android:id="@+id/chipHp"
-                    android:layout_width="wrap_content"
-                    android:layout_height="36dp"
-                    android:text="HP"
-                    android:textColor="#00D4FF"
-                    android:textSize="13sp"
-                    android:gravity="center"
-                    android:paddingStart="16dp"
-                    android:paddingEnd="16dp"
-                    android:background="@drawable/btn_social_neon"
-                    android:layout_marginEnd="8dp"
-                    android:clickable="true"
-                    android:focusable="true"/>
-
-                <TextView
-                    android:id="@+id/chipLenovo"
-                    android:layout_width="wrap_content"
-                    android:layout_height="36dp"
-                    android:text="Lenovo"
-                    android:textColor="#00D4FF"
-                    android:textSize="13sp"
-                    android:gravity="center"
-                    android:paddingStart="16dp"
-                    android:paddingEnd="16dp"
-                    android:background="@drawable/btn_social_neon"
-                    android:layout_marginEnd="8dp"
-                    android:clickable="true"
-                    android:focusable="true"/>
-
-                <TextView
-                    android:id="@+id/chipApple"
-                    android:layout_width="wrap_content"
-                    android:layout_height="36dp"
-                    android:text="Apple"
-                    android:textColor="#00D4FF"
-                    android:textSize="13sp"
-                    android:gravity="center"
-                    android:paddingStart="16dp"
-                    android:paddingEnd="16dp"
-                    android:background="@drawable/btn_social_neon"
-                    android:clickable="true"
-                    android:focusable="true"/>
-
             </LinearLayout>
         </HorizontalScrollView>
 

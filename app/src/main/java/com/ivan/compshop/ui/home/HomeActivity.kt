@@ -90,15 +90,21 @@ class HomeActivity : AppCompatActivity() {
             applyFilters(getCurrentQuery())
         }
 
+        // Real-time listener — автоматски се ажурира кога ќе се додаде нов бренд
         firestore.collection("computers")
-            .get()
-            .addOnSuccessListener { snapshot ->
-                val brands = snapshot.documents
+            .addSnapshotListener { snapshot, _ ->
+                val chipGroup = binding.chipGroup ?: return@addSnapshotListener
+
+                val brands = snapshot?.documents
+                    .orEmpty()
                     .mapNotNull { it.getString("brand") }
                     .distinct()
                     .sorted()
 
-                val chipGroup = binding.chipGroup ?: return@addOnSuccessListener
+                // Избриши ги старите chips, остави само chipAll
+                if (chipGroup.childCount > 1) {
+                    chipGroup.removeViews(1, chipGroup.childCount - 1)
+                }
 
                 brands.forEach { brand ->
                     val chip = TextView(this)
@@ -214,20 +220,34 @@ class HomeActivity : AppCompatActivity() {
     }
 
     private fun loadComputers() {
-        lifecycleScope.launch {
-            try {
-                allComputers = app.computerRepository.getAllComputers()
-                applyFilters("")
-            } catch (e: Exception) {
-                Toast.makeText(this@HomeActivity, "Грешка при вчитување", Toast.LENGTH_SHORT).show()
+        firestore.collection("computers")
+            .addSnapshotListener { snapshot, _ ->
+                if (snapshot == null) return@addSnapshotListener
+                allComputers = snapshot.documents.mapNotNull { doc ->
+                    try {
+                        Computer(
+                            id = doc.id,
+                            brand = doc.getString("brand") ?: "",
+                            model = doc.getString("model") ?: "",
+                            processor = doc.getString("processor") ?: "",
+                            ram = doc.getString("ram") ?: "",
+                            storage = doc.getString("storage") ?: "",
+                            graphics = doc.getString("graphics") ?: "",
+                            price = doc.getDouble("price") ?: 0.0,
+                            imageUrl = doc.getString("imageUrl") ?: "",
+                            description = doc.getString("description") ?: "",
+                            inStock = doc.getBoolean("inStock") ?: true,
+                            quantity = (doc.getLong("quantity") ?: 0).toInt()
+                        )
+                    } catch (e: Exception) { null }
+                }
+                applyFilters(getCurrentQuery())
             }
-        }
     }
 
     private fun applyFilters(query: String) {
         var filtered = allComputers
 
-        // Search
         if (query.isNotEmpty()) {
             filtered = filtered.filter {
                 it.brand.contains(query, ignoreCase = true) ||
@@ -236,14 +256,12 @@ class HomeActivity : AppCompatActivity() {
             }
         }
 
-        // Brand chip
         if (selectedBrand != "All") {
             filtered = filtered.filter {
                 it.brand.contains(selectedBrand, ignoreCase = true)
             }
         }
 
-        // Processor filter
         if (!selectedProcessors.contains("All")) {
             filtered = filtered.filter { computer ->
                 selectedProcessors.any { proc ->
@@ -257,7 +275,6 @@ class HomeActivity : AppCompatActivity() {
             }
         }
 
-        // Price filter
         val priceFiltered = mutableListOf<Computer>()
         if (selectedPriceRanges.contains("All")) {
             priceFiltered.addAll(filtered)
@@ -271,7 +288,6 @@ class HomeActivity : AppCompatActivity() {
         }
         filtered = priceFiltered.distinctBy { it.id }
 
-        // Sort
         filtered = when (selectedSorts.firstOrNull()) {
             "Lowest price" -> filtered.sortedBy { it.price }
             "Highest price" -> filtered.sortedByDescending { it.price }
@@ -291,10 +307,15 @@ class HomeActivity : AppCompatActivity() {
     }
 
     private fun getCurrentQuery(): String {
-        return findViewById<android.widget.EditText>(R.id.etSearch)?.text.toString() ?: ""
+        return findViewById<android.widget.EditText>(R.id.etSearch)?.text?.toString() ?: ""
     }
 
     private fun addToCart(computer: Computer) {
+        if (!computer.inStock || computer.quantity <= 0) {
+            Toast.makeText(this, "⛔ Out of Stock", Toast.LENGTH_SHORT).show()
+            return
+        }
+
         lifecycleScope.launch {
             val cartItem = CartItem(
                 computerId = computer.id,

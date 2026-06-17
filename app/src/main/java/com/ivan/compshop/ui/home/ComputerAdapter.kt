@@ -1,6 +1,7 @@
 package com.ivan.compshop.ui.home
 
 import android.view.LayoutInflater
+import android.view.View
 import android.view.ViewGroup
 import androidx.recyclerview.widget.DiffUtil
 import androidx.recyclerview.widget.ListAdapter
@@ -38,12 +39,22 @@ class ComputerAdapter(
             binding.tvProcessor.text = computer.processor
             binding.tvPrice.text = "$${computer.price}"
 
-            // Слика
             if (computer.imageUrl.isNotEmpty()) {
                 Glide.with(binding.root.context)
                     .load(computer.imageUrl)
                     .placeholder(android.R.drawable.ic_menu_gallery)
                     .into(binding.ivComputer)
+            }
+
+            // Stock
+            if (!computer.inStock || computer.quantity <= 0) {
+                binding.tvOutOfStock.visibility = View.VISIBLE
+                binding.btnAddToCart.isEnabled = false
+                binding.btnAddToCart.alpha = 0.4f
+            } else {
+                binding.tvOutOfStock.visibility = View.GONE
+                binding.btnAddToCart.isEnabled = true
+                binding.btnAddToCart.alpha = 1.0f
             }
 
             // Favorite
@@ -57,11 +68,8 @@ class ComputerAdapter(
                 else android.graphics.Color.parseColor("#80FFFFFF")
             )
             binding.ivFavorite.setOnClickListener {
-                if (favorites.contains(computer.id)) {
-                    favorites.remove(computer.id)
-                } else {
-                    favorites.add(computer.id)
-                }
+                if (favorites.contains(computer.id)) favorites.remove(computer.id)
+                else favorites.add(computer.id)
                 notifyItemChanged(adapterPosition)
             }
 
@@ -71,9 +79,7 @@ class ComputerAdapter(
     }
 
     class DiffCallback : DiffUtil.ItemCallback<Computer>() {
-        override fun areItemsTheSame(oldItem: Computer, newItem: Computer) =
-            oldItem.id == newItem.id
-        override fun areContentsTheSame(oldItem: Computer, newItem: Computer) =
-            oldItem == newItem
+        override fun areItemsTheSame(oldItem: Computer, newItem: Computer) = oldItem.id == newItem.id
+        override fun areContentsTheSame(oldItem: Computer, newItem: Computer) = oldItem == newItem
     }
 }
