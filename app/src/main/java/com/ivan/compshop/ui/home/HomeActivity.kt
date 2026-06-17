@@ -7,6 +7,7 @@ import android.widget.Toast
 import androidx.appcompat.app.AppCompatActivity
 import androidx.lifecycle.lifecycleScope
 import androidx.recyclerview.widget.GridLayoutManager
+import com.google.firebase.auth.FirebaseAuth
 import com.google.firebase.firestore.FirebaseFirestore
 import com.ivan.compshop.CompShopApplication
 import com.ivan.compshop.R
@@ -34,6 +35,7 @@ class HomeActivity : AppCompatActivity() {
     private var selectedBrandChip: TextView? = null
     private var personalUnreadCount = 0
     private var globalUnreadCount = 0
+    private var favoritedIds = mutableSetOf<String>()
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
@@ -47,6 +49,7 @@ class HomeActivity : AppCompatActivity() {
         setupCartHeader()
         setupFilterButton()
         loadComputers()
+        loadFavorites()
         observeNotificationCount()
     }
 
@@ -62,7 +65,8 @@ class HomeActivity : AppCompatActivity() {
                 intent.putExtra("computer_id", computer.id)
                 startActivity(intent)
             },
-            onAddToCart = { computer -> addToCart(computer) }
+            onAddToCart = { computer -> addToCart(computer) },
+            onFavoriteClick = { computer -> toggleFavorite(computer) }
         )
         val spanCount = if (resources.getBoolean(R.bool.isTablet)) 3 else 2
         binding.rvComputers.layoutManager = GridLayoutManager(this, spanCount)
@@ -90,21 +94,15 @@ class HomeActivity : AppCompatActivity() {
             applyFilters(getCurrentQuery())
         }
 
-        // Real-time listener — автоматски се ажурира кога ќе се додаде нов бренд
         firestore.collection("computers")
             .addSnapshotListener { snapshot, _ ->
                 val chipGroup = binding.chipGroup ?: return@addSnapshotListener
-
-                val brands = snapshot?.documents
-                    .orEmpty()
+                val brands = snapshot?.documents.orEmpty()
                     .mapNotNull { it.getString("brand") }
-                    .distinct()
-                    .sorted()
+                    .distinct().sorted()
 
-                // Избриши ги старите chips, остави само chipAll
-                if (chipGroup.childCount > 1) {
+                if (chipGroup.childCount > 1)
                     chipGroup.removeViews(1, chipGroup.childCount - 1)
-                }
 
                 brands.forEach { brand ->
                     val chip = TextView(this)
@@ -115,21 +113,17 @@ class HomeActivity : AppCompatActivity() {
                     chip.setBackgroundResource(R.drawable.btn_social_neon)
                     chip.isClickable = true
                     chip.isFocusable = true
-
                     val params = android.widget.LinearLayout.LayoutParams(
-                        android.widget.LinearLayout.LayoutParams.WRAP_CONTENT,
-                        dpToPx(36)
+                        android.widget.LinearLayout.LayoutParams.WRAP_CONTENT, dpToPx(36)
                     )
                     params.marginEnd = dpToPx(8)
                     chip.layoutParams = params
                     chip.setPadding(dpToPx(16), 0, dpToPx(16), 0)
-
                     chip.setOnClickListener {
                         selectedBrand = brand
                         selectBrandChip(chip)
                         applyFilters(getCurrentQuery())
                     }
-
                     chipGroup.addView(chip)
                 }
             }
@@ -148,6 +142,29 @@ class HomeActivity : AppCompatActivity() {
             com.ivan.compshop.ui.notifications.NotificationsBottomSheet()
                 .show(supportFragmentManager, "NotificationsBottomSheet")
         }
+
+        binding.chipAll?.setOnLongClickListener {
+            showFavoritesDialog()
+            true
+        }
+    }
+
+    private fun showFavoritesDialog() {
+        val favorites = allComputers.filter { favoritedIds.contains(it.id) }
+        if (favorites.isEmpty()) {
+            Toast.makeText(this, "No favorites yet ❤️", Toast.LENGTH_SHORT).show()
+            return
+        }
+        val names = favorites.map { "❤️ ${it.brand} ${it.model} — $${it.price}" }.toTypedArray()
+        android.app.AlertDialog.Builder(this)
+            .setTitle("❤️ Favorites")
+            .setItems(names) { _, index ->
+                val intent = Intent(this, DetailActivity::class.java)
+                intent.putExtra("computer_id", favorites[index].id)
+                startActivity(intent)
+            }
+            .setNegativeButton("Close", null)
+            .show()
     }
 
     private fun setupFilterButton() {
@@ -183,8 +200,41 @@ class HomeActivity : AppCompatActivity() {
         binding.bottomNavigation.selectedItemId = R.id.nav_home
     }
 
+    private fun loadFavorites() {
+        val userId = FirebaseAuth.getInstance().currentUser?.let {
+            if (!it.email.isNullOrEmpty()) it.email else it.uid
+        } ?: return
+
+        firestore.collection("users").document(userId).collection("favorites")
+            .addSnapshotListener { snapshot, _ ->
+                favoritedIds = snapshot?.documents?.map { it.id }?.toMutableSet() ?: mutableSetOf()
+                adapter.setFavorites(favoritedIds)
+            }
+    }
+
+    private fun toggleFavorite(computer: Computer) {
+        val userId = FirebaseAuth.getInstance().currentUser?.let {
+            if (!it.email.isNullOrEmpty()) it.email else it.uid
+        } ?: return
+
+        val favRef = firestore.collection("users").document(userId)
+            .collection("favorites").document(computer.id)
+
+        if (favoritedIds.contains(computer.id)) {
+            favRef.delete()
+        } else {
+            favRef.set(mapOf(
+                "brand" to computer.brand,
+                "model" to computer.model,
+                "price" to computer.price,
+                "imageUrl" to computer.imageUrl,
+                "addedAt" to com.google.firebase.firestore.FieldValue.serverTimestamp()
+            ))
+        }
+    }
+
     private fun observeNotificationCount() {
-        val userId = com.google.firebase.auth.FirebaseAuth.getInstance().currentUser?.let {
+        val userId = FirebaseAuth.getInstance().currentUser?.let {
             if (!it.email.isNullOrEmpty()) it.email else it.uid
         } ?: return
 
@@ -238,7 +288,7 @@ class HomeActivity : AppCompatActivity() {
                             imageUrl = doc.getString("imageUrl") ?: "",
                             description = doc.getString("description") ?: "",
                             quantity = qty,
-                            inStock = qty > 0  // ← секогаш од quantity!
+                            inStock = qty > 0
                         )
                     } catch (e: Exception) { null }
                 }
@@ -316,7 +366,6 @@ class HomeActivity : AppCompatActivity() {
             Toast.makeText(this, "⛔ Out of Stock", Toast.LENGTH_SHORT).show()
             return
         }
-
         lifecycleScope.launch {
             val cartItem = CartItem(
                 computerId = computer.id,

@@ -20,14 +20,44 @@ class ProfileActivity : AppCompatActivity() {
     private lateinit var binding: ActivityProfileBinding
     private val auth = FirebaseAuth.getInstance()
     private val firestore = FirebaseFirestore.getInstance()
+    private var cameraImageUri: Uri? = null
+
+    private val cameraPermissionLauncher = registerForActivityResult(
+        ActivityResultContracts.RequestPermission()
+    ) { granted ->
+        if (granted) openCamera()
+        else Toast.makeText(this, "Camera permission required", Toast.LENGTH_SHORT).show()
+    }
+
+    private val cameraLauncher = registerForActivityResult(
+        ActivityResultContracts.TakePicture()
+    ) { success ->
+        if (success) {
+            cameraImageUri?.let { uri ->
+                val path = saveImageToInternalStorage(uri)
+                if (path != null) {
+                    Glide.with(this).load(java.io.File(path)).circleCrop().into(binding.ivAvatar)
+                    binding.ivAvatar.clearColorFilter()
+                    getSharedPreferences("settings", MODE_PRIVATE)
+                        .edit().putString("profile_image_path", path).apply()
+                    Toast.makeText(this, "Profile photo updated! 📷", Toast.LENGTH_SHORT).show()
+                }
+            }
+        }
+    }
 
     private val imagePickerLauncher = registerForActivityResult(
         ActivityResultContracts.GetContent()
     ) { uri: Uri? ->
         uri?.let {
-            Glide.with(this).load(it).circleCrop().into(binding.ivAvatar)
-            binding.ivAvatar.clearColorFilter()
-            Toast.makeText(this, "Profile photo updated! 📷", Toast.LENGTH_SHORT).show()
+            val path = saveImageToInternalStorage(it)
+            if (path != null) {
+                Glide.with(this).load(java.io.File(path)).circleCrop().into(binding.ivAvatar)
+                binding.ivAvatar.clearColorFilter()
+                getSharedPreferences("settings", MODE_PRIVATE)
+                    .edit().putString("profile_image_path", path).apply()
+                Toast.makeText(this, "Profile photo updated! 📷", Toast.LENGTH_SHORT).show()
+            }
         }
     }
 
@@ -53,21 +83,27 @@ class ProfileActivity : AppCompatActivity() {
         val user = auth.currentUser ?: return
         val userId = getUserId()
 
-        // Прикажи email веднаш
-        val emailText = user.email ?: user.displayName ?: "User"
-        binding.tvEmail.text = emailText
+        binding.tvEmail.text = user.email ?: user.displayName ?: "User"
         binding.tvDisplayName.text = user.displayName ?: user.email?.substringBefore("@") ?: "User"
 
-        firestore.collection("users")
-            .document(userId)
+        // Вчитај зачувана слика веднаш
+        val savedPath = getSharedPreferences("settings", MODE_PRIVATE)
+            .getString("profile_image_path", null)
+        if (savedPath != null) {
+            Glide.with(this)
+                .load(java.io.File(savedPath))
+                .circleCrop()
+                .into(binding.ivAvatar)
+            binding.ivAvatar.clearColorFilter()
+        }
+
+        firestore.collection("users").document(userId)
             .get()
             .addOnSuccessListener { doc ->
-                val name = doc.getString("displayName")
+                binding.tvDisplayName.text = doc.getString("displayName")
                     ?: user.displayName
-                    ?: user.email?.substringBefore("@")
-                    ?: "User"
-                binding.tvDisplayName.text = name
-                binding.etFullName.setText(name)
+                            ?: user.email?.substringBefore("@") ?: "User"
+                binding.etFullName.setText(doc.getString("displayName") ?: "")
                 binding.etPhone.setText(doc.getString("phone") ?: "")
                 binding.etAddress.setText(doc.getString("address") ?: "")
 
@@ -78,14 +114,28 @@ class ProfileActivity : AppCompatActivity() {
                 }
             }
     }
+
+    private fun saveImageToInternalStorage(uri: Uri): String? {
+        return try {
+            val inputStream = contentResolver.openInputStream(uri) ?: return null
+            val file = java.io.File(filesDir, "profile_photo.jpg")
+            val outputStream = java.io.FileOutputStream(file)
+            inputStream.copyTo(outputStream)
+            inputStream.close()
+            outputStream.close()
+            file.absolutePath
+        } catch (e: Exception) {
+            null
+        }
+    }
+
     private fun loadStats() {
         val userId = getUserId()
         var totalOrderCount = 0
         var totalSpentAmount = 0.0
         var completed = 0
 
-        // Генерирај последните 30 дена
-        val sdf = java.text.SimpleDateFormat("yyyy-MM-dd", java.util.Locale.getDefault())
+        val sdf = java.text.SimpleDateFormat("yyyy-MM-dd", Locale.getDefault())
         val calendar = java.util.Calendar.getInstance()
         val dates = (0..30).map {
             val date = sdf.format(calendar.time)
@@ -94,9 +144,7 @@ class ProfileActivity : AppCompatActivity() {
         }
 
         dates.forEach { date ->
-            firestore.collection("orders")
-                .document(date)
-                .collection(userId)
+            firestore.collection("orders").document(date).collection(userId)
                 .get()
                 .addOnSuccessListener { snapshot ->
                     totalOrderCount += snapshot.size()
@@ -145,8 +193,7 @@ class ProfileActivity : AppCompatActivity() {
                 "phone" to binding.etPhone.text.toString().trim(),
                 "address" to binding.etAddress.text.toString().trim()
             )
-            firestore.collection("users")
-                .document(userId)
+            firestore.collection("users").document(userId)
                 .set(updates, com.google.firebase.firestore.SetOptions.merge())
                 .addOnSuccessListener {
                     binding.tvDisplayName.text = binding.etFullName.text.toString().trim()
@@ -164,14 +211,40 @@ class ProfileActivity : AppCompatActivity() {
 
     private fun setupAvatar() {
         binding.layoutAvatar.setOnClickListener {
-            imagePickerLauncher.launch("image/*")
+            android.app.AlertDialog.Builder(this)
+                .setTitle("Choose photo")
+                .setItems(arrayOf("📷 Camera", "🖼️ Gallery")) { _, which ->
+                    when (which) {
+                        0 -> {
+                            if (checkSelfPermission(android.Manifest.permission.CAMERA)
+                                == android.content.pm.PackageManager.PERMISSION_GRANTED) {
+                                openCamera()
+                            } else {
+                                cameraPermissionLauncher.launch(android.Manifest.permission.CAMERA)
+                            }
+                        }
+                        1 -> imagePickerLauncher.launch("image/*")
+                    }
+                }
+                .show()
+        }
+    }
+
+    private fun openCamera() {
+        try {
+            val photoFile = java.io.File.createTempFile("profile_", ".jpg", cacheDir)
+            cameraImageUri = androidx.core.content.FileProvider.getUriForFile(
+                this, "${packageName}.provider", photoFile
+            )
+            cameraLauncher.launch(cameraImageUri)
+        } catch (e: Exception) {
+            Toast.makeText(this, "Camera error: ${e.message}", Toast.LENGTH_SHORT).show()
         }
     }
 
     private fun setupChangePassword() {
         binding.layoutChangePassword.setOnClickListener {
             val user = auth.currentUser ?: return@setOnClickListener
-
             val isEmailProvider = user.providerData.any { it.providerId == "password" }
             if (!isEmailProvider) {
                 Toast.makeText(this, "Only available for email/password accounts", Toast.LENGTH_SHORT).show()
@@ -189,12 +262,10 @@ class ProfileActivity : AppCompatActivity() {
             btnChange?.setOnClickListener {
                 val currentPass = etCurrent?.text.toString().trim()
                 val newPass = etNew?.text.toString().trim()
-
                 if (currentPass.isEmpty() || newPass.length < 6) {
                     Toast.makeText(this, "Fill all fields (min 6 chars)", Toast.LENGTH_SHORT).show()
                     return@setOnClickListener
                 }
-
                 val credential = EmailAuthProvider.getCredential(user.email!!, currentPass)
                 user.reauthenticate(credential)
                     .addOnSuccessListener {
@@ -248,20 +319,13 @@ class ProfileActivity : AppCompatActivity() {
     private fun setLocale(lang: String) {
         val prefs = getSharedPreferences("settings", MODE_PRIVATE)
         prefs.edit().putString("language", lang).apply()
-
-        val locale = java.util.Locale(lang)
-        java.util.Locale.setDefault(locale)
+        val locale = Locale(lang)
+        Locale.setDefault(locale)
         val config = android.content.res.Configuration(resources.configuration)
         config.setLocale(locale)
         resources.updateConfiguration(config, resources.displayMetrics)
-
-        // Рестартирај апликацијата целосно
         val intent = packageManager.getLaunchIntentForPackage(packageName)
-        intent?.addFlags(
-            Intent.FLAG_ACTIVITY_CLEAR_TOP or
-                    Intent.FLAG_ACTIVITY_CLEAR_TASK or
-                    Intent.FLAG_ACTIVITY_NEW_TASK
-        )
+        intent?.addFlags(Intent.FLAG_ACTIVITY_CLEAR_TOP or Intent.FLAG_ACTIVITY_CLEAR_TASK or Intent.FLAG_ACTIVITY_NEW_TASK)
         startActivity(intent)
         finish()
     }
@@ -273,12 +337,8 @@ class ProfileActivity : AppCompatActivity() {
 
         binding.switchDarkMode.setOnCheckedChangeListener { _, isChecked ->
             prefs.edit().putBoolean("dark_mode", isChecked).apply()
-            if (isChecked) {
-                AppCompatDelegate.setDefaultNightMode(AppCompatDelegate.MODE_NIGHT_YES)
-            } else {
-                AppCompatDelegate.setDefaultNightMode(AppCompatDelegate.MODE_NIGHT_NO)
-            }
-            // Рестартирај за да се примени
+            if (isChecked) AppCompatDelegate.setDefaultNightMode(AppCompatDelegate.MODE_NIGHT_YES)
+            else AppCompatDelegate.setDefaultNightMode(AppCompatDelegate.MODE_NIGHT_NO)
             val intent = packageManager.getLaunchIntentForPackage(packageName)
             intent?.addFlags(Intent.FLAG_ACTIVITY_CLEAR_TOP or Intent.FLAG_ACTIVITY_NEW_TASK)
             startActivity(intent)

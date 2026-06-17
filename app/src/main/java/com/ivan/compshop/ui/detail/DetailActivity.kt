@@ -5,6 +5,7 @@ import android.widget.Toast
 import androidx.appcompat.app.AppCompatActivity
 import androidx.lifecycle.lifecycleScope
 import com.bumptech.glide.Glide
+import com.google.firebase.auth.FirebaseAuth
 import com.google.firebase.firestore.FirebaseFirestore
 import com.ivan.compshop.CompShopApplication
 import com.ivan.compshop.R
@@ -17,6 +18,8 @@ class DetailActivity : AppCompatActivity() {
 
     private lateinit var binding: ActivityDetailBinding
     private val app by lazy { application as CompShopApplication }
+    private val firestore = FirebaseFirestore.getInstance()
+    private val auth = FirebaseAuth.getInstance()
     private var isFavorite = false
     private var currentQuantity = 1
     private var maxQuantity = 0
@@ -36,8 +39,7 @@ class DetailActivity : AppCompatActivity() {
     }
 
     private fun loadComputer(computerId: String) {
-        FirebaseFirestore.getInstance()
-            .collection("computers")
+        firestore.collection("computers")
             .document(computerId)
             .addSnapshotListener { doc, _ ->
                 if (doc == null) return@addSnapshotListener
@@ -74,16 +76,41 @@ class DetailActivity : AppCompatActivity() {
                         .into(binding.ivComputer)
                 }
 
-                binding.ivFavoriteDetail.setOnClickListener {
-                    isFavorite = !isFavorite
-                    binding.ivFavoriteDetail.setImageResource(
-                        if (isFavorite) android.R.drawable.btn_star_big_on
-                        else R.drawable.ic_favorite_border
-                    )
-                    binding.ivFavoriteDetail.setColorFilter(
-                        if (isFavorite) android.graphics.Color.parseColor("#FF4081")
-                        else android.graphics.Color.parseColor("#80FFFFFF")
-                    )
+                // Favorites со Firestore
+                val userId = auth.currentUser?.let {
+                    if (!it.email.isNullOrEmpty()) it.email else it.uid
+                } ?: ""
+
+                if (userId.isNotEmpty()) {
+                    firestore.collection("users").document(userId)
+                        .collection("favorites").document(computer.id)
+                        .addSnapshotListener { favDoc, _ ->
+                            isFavorite = favDoc?.exists() == true
+                            binding.ivFavoriteDetail.setImageResource(
+                                if (isFavorite) android.R.drawable.btn_star_big_on
+                                else R.drawable.ic_favorite_border
+                            )
+                            binding.ivFavoriteDetail.setColorFilter(
+                                if (isFavorite) android.graphics.Color.parseColor("#FF4081")
+                                else android.graphics.Color.parseColor("#80FFFFFF")
+                            )
+                        }
+
+                    binding.ivFavoriteDetail.setOnClickListener {
+                        val favRef = firestore.collection("users").document(userId)
+                            .collection("favorites").document(computer.id)
+                        if (isFavorite) {
+                            favRef.delete()
+                        } else {
+                            favRef.set(mapOf(
+                                "brand" to computer.brand,
+                                "model" to computer.model,
+                                "price" to computer.price,
+                                "imageUrl" to computer.imageUrl,
+                                "addedAt" to com.google.firebase.firestore.FieldValue.serverTimestamp()
+                            ))
+                        }
+                    }
                 }
 
                 // Stock

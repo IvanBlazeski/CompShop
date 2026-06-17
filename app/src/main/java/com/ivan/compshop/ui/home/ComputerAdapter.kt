@@ -13,10 +13,17 @@ import com.ivan.compshop.model.Computer
 
 class ComputerAdapter(
     private val onItemClick: (Computer) -> Unit,
-    private val onAddToCart: (Computer) -> Unit
+    private val onAddToCart: (Computer) -> Unit,
+    private val onFavoriteClick: (Computer) -> Unit
 ) : ListAdapter<Computer, ComputerAdapter.ComputerViewHolder>(DiffCallback()) {
 
     private val favorites = mutableSetOf<String>()
+
+    fun setFavorites(ids: Set<String>) {
+        favorites.clear()
+        favorites.addAll(ids)
+        notifyDataSetChanged()
+    }
 
     override fun onCreateViewHolder(parent: ViewGroup, viewType: Int): ComputerViewHolder {
         val binding = ItemComputerBinding.inflate(
@@ -46,7 +53,6 @@ class ComputerAdapter(
                     .into(binding.ivComputer)
             }
 
-            // Stock
             if (!computer.inStock || computer.quantity <= 0) {
                 binding.tvOutOfStock.visibility = View.VISIBLE
                 binding.btnAddToCart.isEnabled = false
@@ -57,7 +63,6 @@ class ComputerAdapter(
                 binding.btnAddToCart.alpha = 1.0f
             }
 
-            // Favorite
             val isFav = favorites.contains(computer.id)
             binding.ivFavorite.setImageResource(
                 if (isFav) android.R.drawable.btn_star_big_on
@@ -68,9 +73,7 @@ class ComputerAdapter(
                 else android.graphics.Color.parseColor("#80FFFFFF")
             )
             binding.ivFavorite.setOnClickListener {
-                if (favorites.contains(computer.id)) favorites.remove(computer.id)
-                else favorites.add(computer.id)
-                notifyItemChanged(adapterPosition)
+                onFavoriteClick(computer)
             }
 
             binding.root.setOnClickListener { onItemClick(computer) }
