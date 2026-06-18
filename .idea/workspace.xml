@@ -247,8 +247,9 @@
   </component>
   <component name="ChangeListManager">
     <list default="true" id="e83b81be-802c-4a86-acb7-9582f79cc869" name="Changes" comment="">
-      <change afterPath="$PROJECT_DIR$/app/src/main/res/layout-land/activity_detail.xml" afterDir="false" />
-      <change afterPath="$PROJECT_DIR$/app/src/main/res/layout-sw600dp/activity_detail.xml" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/.idea/workspace.xml" beforeDir="false" afterPath="$PROJECT_DIR$/.idea/workspace.xml" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/app/src/main/java/com/ivan/compshop/CompShopMessagingService.kt" beforeDir="false" afterPath="$PROJECT_DIR$/app/src/main/java/com/ivan/compshop/CompShopMessagingService.kt" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/app/src/main/java/com/ivan/compshop/ui/home/HomeActivity.kt" beforeDir="false" afterPath="$PROJECT_DIR$/app/src/main/java/com/ivan/compshop/ui/home/HomeActivity.kt" afterDir="false" />
     </list>
     <option name="SHOW_DIALOG" value="false" />
     <option name="HIGHLIGHT_CONFLICTS" value="true" />

@@ -53,7 +53,18 @@ class HomeActivity : AppCompatActivity() {
         loadComputers()
         loadFavorites()
         observeNotificationCount()
+
+
+        com.google.firebase.messaging.FirebaseMessaging.getInstance().token
+            .addOnSuccessListener { token ->
+                android.util.Log.d("FCM_TOKEN", "Token: $token")
+                Toast.makeText(this, "Token: ${token.take(20)}...", Toast.LENGTH_LONG).show()
+            }
+            .addOnFailureListener { e ->
+                android.util.Log.e("FCM_TOKEN", "Error: ${e.message}")
+            }
     }
+
 
     override fun onResume() {
         super.onResume()

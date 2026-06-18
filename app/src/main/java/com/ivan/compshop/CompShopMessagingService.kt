@@ -23,7 +23,14 @@ class CompShopMessagingService : FirebaseMessagingService() {
 
     override fun onNewToken(token: String) {
         super.onNewToken(token)
-        // Токенот може да се зачува во Firestore
+        // Зачувај го токенот во Firestore
+        val userId = com.google.firebase.auth.FirebaseAuth.getInstance()
+            .currentUser?.email ?: return
+
+        com.google.firebase.firestore.FirebaseFirestore.getInstance()
+            .collection("users")
+            .document(userId)
+            .update("fcmToken", token)
     }
 
     private fun sendNotification(title: String, body: String) {
