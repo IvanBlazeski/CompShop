@@ -55,28 +55,32 @@
 
 ## 📸 Screenshots
 
-### Login
-![Login](screenshots/login.jpg)
-
-### Home Screen
-![Home](screenshots/home.jpg)
-
-### Detail Screen
-![Detail](screenshots/details.jpg)
-
-### Cart
-![Cart](screenshots/cart.jpg)
-
-### Orders & Tracking
-![Orders](screenshots/orders.jpg)
-
-### Profile
-![Profile 1](screenshots/profile1.jpg)
-![Profile 2](screenshots/profile2.jpg)
-
-### Notifications
-![Notifications](screenshots/notifications.jpg)
----
+<table>
+  <tr>
+    <td><img src="screenshots/login.jpg" width="200"/></td>
+    <td><img src="screenshots/home.jpg" width="200"/></td>
+    <td><img src="screenshots/details.jpg" width="200"/></td>
+    <td><img src="screenshots/cart.jpg" width="200"/></td>
+  </tr>
+  <tr>
+    <td align="center">Login</td>
+    <td align="center">Home</td>
+    <td align="center">Detail</td>
+    <td align="center">Cart</td>
+  </tr>
+  <tr>
+    <td><img src="screenshots/orders.jpg" width="200"/></td>
+    <td><img src="screenshots/notifications.jpg" width="200"/></td>
+    <td><img src="screenshots/profile1.jpg" width="200"/></td>
+    <td><img src="screenshots/profile2.jpg" width="200"/></td>
+  </tr>
+  <tr>
+    <td align="center">Orders</td>
+    <td align="center">Notifications</td>
+    <td align="center">Profile 1</td>
+    <td align="center">Profile 2</td>
+  </tr>
+</table>
 
 ## 🗂️ Project Structure
 
