@@ -58,12 +58,12 @@
             android:layout_marginBottom="24dp">
 
             <FrameLayout
+                android:id="@+id/layoutAvatar"
                 android:layout_width="110dp"
                 android:layout_height="110dp"
                 android:layout_marginBottom="12dp"
                 android:clickable="true"
-                android:focusable="true"
-                android:id="@+id/layoutAvatar">
+                android:focusable="true">
 
                 <ImageView
                     android:id="@+id/ivAvatar"
@@ -71,9 +71,7 @@
                     android:layout_height="110dp"
                     android:src="@drawable/ic_profile"
                     android:background="@drawable/btn_social_neon"
-                    android:padding="24dp"
-                    android:scaleType="centerCrop"
-                    app:tint="#00D4FF"/>
+                    android:scaleType="centerCrop"/>
 
                 <TextView
                     android:layout_width="match_parent"
@@ -136,7 +134,6 @@
                 android:textColor="#00D4FF"
                 android:layout_marginBottom="16dp"/>
 
-            <!-- Full Name -->
             <TextView
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
@@ -156,9 +153,9 @@
                 android:layout_marginBottom="16dp">
 
                 <EditText
+                    android:id="@+id/etFullName"
                     android:enabled="false"
                     android:alpha="0.7"
-                    android:id="@+id/etFullName"
                     android:layout_width="match_parent"
                     android:layout_height="match_parent"
                     android:hint="@string/full_name"
@@ -167,9 +164,9 @@
                     android:textColorHint="#73FFFFFF"
                     android:background="@android:color/transparent"
                     android:textSize="15sp"/>
+
             </LinearLayout>
 
-            <!-- Phone -->
             <TextView
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
@@ -189,9 +186,9 @@
                 android:layout_marginBottom="16dp">
 
                 <EditText
+                    android:id="@+id/etPhone"
                     android:enabled="false"
                     android:alpha="0.7"
-                    android:id="@+id/etPhone"
                     android:layout_width="match_parent"
                     android:layout_height="match_parent"
                     android:hint="@string/phone"
@@ -203,7 +200,6 @@
 
             </LinearLayout>
 
-            <!-- Address -->
             <TextView
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
@@ -223,9 +219,9 @@
                 android:layout_marginBottom="20dp">
 
                 <EditText
+                    android:id="@+id/etAddress"
                     android:enabled="false"
                     android:alpha="0.7"
-                    android:id="@+id/etAddress"
                     android:layout_width="match_parent"
                     android:layout_height="match_parent"
                     android:hint="@string/address"
@@ -237,7 +233,6 @@
 
             </LinearLayout>
 
-            <!-- Buttons -->
             <LinearLayout
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
@@ -270,6 +265,7 @@
                     android:stateListAnimator="@null"/>
 
             </LinearLayout>
+
         </LinearLayout>
 
         <!-- Stats Card -->
@@ -360,7 +356,6 @@
                 android:textColor="#00D4FF"
                 android:layout_marginBottom="16dp"/>
 
-            <!-- Change Password -->
             <LinearLayout
                 android:id="@+id/layoutChangePassword"
                 android:layout_width="match_parent"
@@ -391,7 +386,6 @@
 
             </LinearLayout>
 
-            <!-- Language -->
             <LinearLayout
                 android:layout_width="match_parent"
                 android:layout_height="52dp"
@@ -443,7 +437,6 @@
 
             </LinearLayout>
 
-            <!-- Dark/Light Mode -->
             <LinearLayout
                 android:layout_width="match_parent"
                 android:layout_height="52dp"
@@ -471,7 +464,7 @@
 
         </LinearLayout>
 
-        <!-- Logout Button -->
+        <!-- Logout -->
         <Button
             android:id="@+id/btnLogout"
             android:layout_width="match_parent"

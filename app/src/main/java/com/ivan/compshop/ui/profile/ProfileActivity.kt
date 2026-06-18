@@ -36,10 +36,9 @@ class ProfileActivity : AppCompatActivity() {
             cameraImageUri?.let { uri ->
                 val path = saveImageToInternalStorage(uri)
                 if (path != null) {
-                    Glide.with(this).load(java.io.File(path)).circleCrop().into(binding.ivAvatar)
-                    binding.ivAvatar.clearColorFilter()
                     getSharedPreferences("settings", MODE_PRIVATE)
                         .edit().putString("profile_image_path", path).apply()
+                    showProfileImage(path)
                     Toast.makeText(this, "Profile photo updated! 📷", Toast.LENGTH_SHORT).show()
                 }
             }
@@ -50,12 +49,16 @@ class ProfileActivity : AppCompatActivity() {
         ActivityResultContracts.GetContent()
     ) { uri: Uri? ->
         uri?.let {
+            try {
+                contentResolver.takePersistableUriPermission(
+                    it, Intent.FLAG_GRANT_READ_URI_PERMISSION
+                )
+            } catch (e: Exception) { }
             val path = saveImageToInternalStorage(it)
             if (path != null) {
-                Glide.with(this).load(java.io.File(path)).circleCrop().into(binding.ivAvatar)
-                binding.ivAvatar.clearColorFilter()
                 getSharedPreferences("settings", MODE_PRIVATE)
                     .edit().putString("profile_image_path", path).apply()
+                showProfileImage(path)
                 Toast.makeText(this, "Profile photo updated! 📷", Toast.LENGTH_SHORT).show()
             }
         }
@@ -90,11 +93,7 @@ class ProfileActivity : AppCompatActivity() {
         val savedPath = getSharedPreferences("settings", MODE_PRIVATE)
             .getString("profile_image_path", null)
         if (savedPath != null) {
-            Glide.with(this)
-                .load(java.io.File(savedPath))
-                .circleCrop()
-                .into(binding.ivAvatar)
-            binding.ivAvatar.clearColorFilter()
+            showProfileImage(savedPath)
         }
 
         firestore.collection("users").document(userId)
@@ -115,9 +114,57 @@ class ProfileActivity : AppCompatActivity() {
             }
     }
 
+    private fun showProfileImage(path: String) {
+        val file = java.io.File(path)
+        if (!file.exists()) return
+
+        val bitmap = android.graphics.BitmapFactory.decodeFile(path) ?: return
+
+        // Прочитај EXIF ориентација
+        val exif = androidx.exifinterface.media.ExifInterface(path)
+        val orientation = exif.getAttributeInt(
+            androidx.exifinterface.media.ExifInterface.TAG_ORIENTATION,
+            androidx.exifinterface.media.ExifInterface.ORIENTATION_NORMAL
+        )
+        val rotation = when (orientation) {
+            androidx.exifinterface.media.ExifInterface.ORIENTATION_ROTATE_90 -> 90f
+            androidx.exifinterface.media.ExifInterface.ORIENTATION_ROTATE_180 -> 180f
+            androidx.exifinterface.media.ExifInterface.ORIENTATION_ROTATE_270 -> 270f
+            else -> 0f
+        }
+
+        // Ротирај bitmap
+        val matrix = android.graphics.Matrix()
+        matrix.postRotate(rotation)
+        val rotated = android.graphics.Bitmap.createBitmap(
+            bitmap, 0, 0, bitmap.width, bitmap.height, matrix, true
+        )
+
+        // Crop во круг
+        val size = minOf(rotated.width, rotated.height)
+        val x = (rotated.width - size) / 2
+        val y = (rotated.height - size) / 2
+        val cropped = android.graphics.Bitmap.createBitmap(rotated, x, y, size, size)
+
+        val output = android.graphics.Bitmap.createBitmap(size, size, android.graphics.Bitmap.Config.ARGB_8888)
+        val canvas = android.graphics.Canvas(output)
+        val paint = android.graphics.Paint()
+        paint.isAntiAlias = true
+        canvas.drawCircle(size / 2f, size / 2f, size / 2f, paint)
+        paint.xfermode = android.graphics.PorterDuffXfermode(android.graphics.PorterDuff.Mode.SRC_IN)
+        canvas.drawBitmap(cropped, 0f, 0f, paint)
+
+        binding.ivAvatar.setImageBitmap(output)
+        binding.ivAvatar.imageTintList = null
+    }
+
     private fun saveImageToInternalStorage(uri: Uri): String? {
         return try {
-            val inputStream = contentResolver.openInputStream(uri) ?: return null
+            val inputStream = contentResolver.openInputStream(uri)
+            if (inputStream == null) {
+                Toast.makeText(this, "Cannot open image", Toast.LENGTH_SHORT).show()
+                return null
+            }
             val file = java.io.File(filesDir, "profile_photo.jpg")
             val outputStream = java.io.FileOutputStream(file)
             inputStream.copyTo(outputStream)
@@ -125,6 +172,7 @@ class ProfileActivity : AppCompatActivity() {
             outputStream.close()
             file.absolutePath
         } catch (e: Exception) {
+            Toast.makeText(this, "Error: ${e.message}", Toast.LENGTH_LONG).show()
             null
         }
     }
