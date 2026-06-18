@@ -126,9 +126,21 @@
           <theme>@style/Theme.CompShop</theme>
         </config>
       </layout>
+      <layout url="file://$PROJECT_DIR$/app/src/main/res/layout-land/activity_detail.xml">
+        <config>
+          <state>Landscape</state>
+          <theme>@style/Theme.CompShop</theme>
+        </config>
+      </layout>
       <layout url="file://$PROJECT_DIR$/app/src/main/res/layout-land/activity_home.xml">
         <config>
           <state>Landscape</state>
+          <theme>@style/Theme.CompShop</theme>
+        </config>
+      </layout>
+      <layout url="file://$PROJECT_DIR$/app/src/main/res/layout-sw600dp/activity_detail.xml">
+        <config>
+          <state>Portrait</state>
           <theme>@style/Theme.CompShop</theme>
         </config>
       </layout>
@@ -234,7 +246,10 @@
     <option name="autoReloadType" value="NONE" />
   </component>
   <component name="ChangeListManager">
-    <list default="true" id="e83b81be-802c-4a86-acb7-9582f79cc869" name="Changes" comment="" />
+    <list default="true" id="e83b81be-802c-4a86-acb7-9582f79cc869" name="Changes" comment="">
+      <change afterPath="$PROJECT_DIR$/app/src/main/res/layout-land/activity_detail.xml" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/app/src/main/res/layout-sw600dp/activity_detail.xml" afterDir="false" />
+    </list>
     <option name="SHOW_DIALOG" value="false" />
     <option name="HIGHLIGHT_CONFLICTS" value="true" />
     <option name="HIGHLIGHT_NON_ACTIVE_CHANGELIST" value="false" />
@@ -273,8 +288,8 @@
         <option value="valueResourceFile" />
         <option value="Kotlin File" />
         <option value="Kotlin Class" />
-        <option value="layoutResourceFile" />
         <option value="resourceFile" />
+        <option value="layoutResourceFile" />
       </list>
     </option>
   </component>

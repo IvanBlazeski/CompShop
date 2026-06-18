@@ -1,0 +1,266 @@
+<?xml version="1.0" encoding="utf-8"?>
+<ScrollView xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:app="http://schemas.android.com/apk/res-auto"
+    android:layout_width="match_parent"
+    android:layout_height="match_parent"
+    android:background="@drawable/gradient_bg">
+
+    <LinearLayout
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:orientation="vertical"
+        android:paddingBottom="48dp">
+
+        <!-- Header -->
+        <LinearLayout
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:orientation="horizontal"
+            android:gravity="center_vertical"
+            android:paddingStart="32dp"
+            android:paddingEnd="32dp"
+            android:paddingTop="56dp"
+            android:paddingBottom="20dp">
+
+            <ImageView
+                android:id="@+id/btnBack"
+                android:layout_width="48dp"
+                android:layout_height="48dp"
+                android:src="@android:drawable/ic_media_previous"
+                app:tint="#00D4FF"
+                android:background="@drawable/btn_social_neon"
+                android:padding="10dp"
+                android:clickable="true"
+                android:focusable="true"/>
+
+            <TextView
+                android:layout_width="0dp"
+                android:layout_height="wrap_content"
+                android:layout_weight="1"
+                android:text="@string/details_title"
+                android:textSize="26sp"
+                android:textStyle="bold"
+                android:textColor="#FFFFFF"
+                android:gravity="center"/>
+
+            <ImageView
+                android:id="@+id/ivFavoriteDetail"
+                android:layout_width="48dp"
+                android:layout_height="48dp"
+                android:src="@drawable/ic_favorite_border"
+                app:tint="#80FFFFFF"
+                android:background="@drawable/btn_social_neon"
+                android:padding="10dp"
+                android:clickable="true"
+                android:focusable="true"/>
+
+        </LinearLayout>
+
+        <!-- Two Column Layout for Tablet -->
+        <LinearLayout
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:orientation="horizontal"
+            android:paddingStart="32dp"
+            android:paddingEnd="32dp"
+            android:layout_marginBottom="24dp">
+
+            <!-- Image -->
+            <LinearLayout
+                android:layout_width="0dp"
+                android:layout_height="320dp"
+                android:layout_weight="1"
+                android:background="@drawable/image_container"
+                android:gravity="center"
+                android:layout_marginEnd="16dp"
+                android:padding="16dp">
+
+                <ImageView
+                    android:id="@+id/ivComputer"
+                    android:layout_width="match_parent"
+                    android:layout_height="match_parent"
+                    android:scaleType="fitCenter"
+                    android:src="@android:drawable/ic_menu_gallery"/>
+
+            </LinearLayout>
+
+            <!-- Price + Quick Info -->
+            <LinearLayout
+                android:layout_width="0dp"
+                android:layout_height="wrap_content"
+                android:layout_weight="1"
+                android:orientation="vertical"
+                android:background="@drawable/card_glass_neon"
+                android:padding="24dp">
+
+                <TextView
+                    android:id="@+id/tvBrand"
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:text="Brand"
+                    android:textColor="#00D4FF"
+                    android:textSize="14sp"
+                    android:textStyle="bold"
+                    android:layout_marginBottom="4dp"/>
+
+                <TextView
+                    android:id="@+id/tvModel"
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:text="Model"
+                    android:textSize="28sp"
+                    android:textStyle="bold"
+                    android:textColor="#FFFFFF"
+                    android:layout_marginBottom="8dp"/>
+
+                <TextView
+                    android:id="@+id/tvPrice"
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:text="$0.00"
+                    android:textSize="34sp"
+                    android:textStyle="bold"
+                    android:textColor="#00E5FF"
+                    android:layout_marginBottom="20dp"/>
+
+                <!-- Quantity -->
+                <LinearLayout
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:orientation="horizontal"
+                    android:gravity="center_vertical"
+                    android:layout_marginBottom="16dp">
+
+                    <Button
+                        android:id="@+id/btnMinus"
+                        android:layout_width="48dp"
+                        android:layout_height="48dp"
+                        android:text="-"
+                        android:textSize="22sp"
+                        android:textColor="#00D4FF"
+                        android:background="@drawable/btn_social_neon"
+                        android:stateListAnimator="@null"
+                        android:padding="0dp"/>
+
+                    <TextView
+                        android:id="@+id/tvQuantity"
+                        android:layout_width="60dp"
+                        android:layout_height="wrap_content"
+                        android:text="1"
+                        android:textSize="22sp"
+                        android:textStyle="bold"
+                        android:textColor="#FFFFFF"
+                        android:gravity="center"/>
+
+                    <Button
+                        android:id="@+id/btnPlus"
+                        android:layout_width="48dp"
+                        android:layout_height="48dp"
+                        android:text="+"
+                        android:textSize="22sp"
+                        android:textColor="#00D4FF"
+                        android:background="@drawable/btn_social_neon"
+                        android:stateListAnimator="@null"
+                        android:padding="0dp"/>
+
+                </LinearLayout>
+
+                <Button
+                    android:id="@+id/btnAddToCart"
+                    android:layout_width="match_parent"
+                    android:layout_height="60dp"
+                    android:text="@string/add_to_cart"
+                    android:textSize="17sp"
+                    android:textStyle="bold"
+                    android:textColor="#FFFFFF"
+                    android:background="@drawable/btn_neon_gradient"
+                    android:stateListAnimator="@null"
+                    android:layout_marginBottom="10dp"/>
+
+                <Button
+                    android:id="@+id/btnBuyNow"
+                    android:layout_width="match_parent"
+                    android:layout_height="60dp"
+                    android:text="@string/buy_now"
+                    android:textSize="17sp"
+                    android:textStyle="bold"
+                    android:textColor="#00D4FF"
+                    android:background="@drawable/btn_social_neon"
+                    android:stateListAnimator="@null"/>
+
+            </LinearLayout>
+        </LinearLayout>
+
+        <!-- Specs Card -->
+        <LinearLayout
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:orientation="vertical"
+            android:background="@drawable/card_glass_neon"
+            android:layout_marginStart="32dp"
+            android:layout_marginEnd="32dp"
+            android:layout_marginBottom="16dp"
+            android:padding="24dp">
+
+            <TextView
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:text="@string/specifications"
+                android:textSize="18sp"
+                android:textStyle="bold"
+                android:textColor="#00D4FF"
+                android:layout_marginBottom="16dp"/>
+
+            <LinearLayout android:layout_width="match_parent" android:layout_height="wrap_content" android:orientation="horizontal" android:layout_marginBottom="12dp">
+                <TextView android:layout_width="0dp" android:layout_height="wrap_content" android:layout_weight="1" android:text="@string/processor" android:textColor="#99FFFFFF" android:textSize="15sp"/>
+                <TextView android:id="@+id/tvProcessor" android:layout_width="0dp" android:layout_height="wrap_content" android:layout_weight="1" android:text="Processor" android:textColor="#FFFFFF" android:textSize="15sp" android:textStyle="bold"/>
+            </LinearLayout>
+
+            <LinearLayout android:layout_width="match_parent" android:layout_height="wrap_content" android:orientation="horizontal" android:layout_marginBottom="12dp">
+                <TextView android:layout_width="0dp" android:layout_height="wrap_content" android:layout_weight="1" android:text="@string/ram" android:textColor="#99FFFFFF" android:textSize="15sp"/>
+                <TextView android:id="@+id/tvRam" android:layout_width="0dp" android:layout_height="wrap_content" android:layout_weight="1" android:text="RAM" android:textColor="#FFFFFF" android:textSize="15sp" android:textStyle="bold"/>
+            </LinearLayout>
+
+            <LinearLayout android:layout_width="match_parent" android:layout_height="wrap_content" android:orientation="horizontal" android:layout_marginBottom="12dp">
+                <TextView android:layout_width="0dp" android:layout_height="wrap_content" android:layout_weight="1" android:text="@string/storage" android:textColor="#99FFFFFF" android:textSize="15sp"/>
+                <TextView android:id="@+id/tvStorage" android:layout_width="0dp" android:layout_height="wrap_content" android:layout_weight="1" android:text="Storage" android:textColor="#FFFFFF" android:textSize="15sp" android:textStyle="bold"/>
+            </LinearLayout>
+
+            <LinearLayout android:layout_width="match_parent" android:layout_height="wrap_content" android:orientation="horizontal">
+                <TextView android:layout_width="0dp" android:layout_height="wrap_content" android:layout_weight="1" android:text="@string/graphics" android:textColor="#99FFFFFF" android:textSize="15sp"/>
+                <TextView android:id="@+id/tvGraphics" android:layout_width="0dp" android:layout_height="wrap_content" android:layout_weight="1" android:text="Graphics" android:textColor="#FFFFFF" android:textSize="15sp" android:textStyle="bold"/>
+            </LinearLayout>
+
+        </LinearLayout>
+
+        <!-- Description -->
+        <LinearLayout
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:orientation="vertical"
+            android:background="@drawable/card_glass_neon"
+            android:layout_marginStart="32dp"
+            android:layout_marginEnd="32dp"
+            android:padding="24dp">
+
+            <TextView
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:text="@string/details"
+                android:textSize="18sp"
+                android:textStyle="bold"
+                android:textColor="#00D4FF"
+                android:layout_marginBottom="8dp"/>
+
+            <TextView
+                android:id="@+id/tvDescription"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:text="Description"
+                android:textSize="15sp"
+                android:textColor="#A6FFFFFF"/>
+
+        </LinearLayout>
+
+    </LinearLayout>
+</ScrollView>
