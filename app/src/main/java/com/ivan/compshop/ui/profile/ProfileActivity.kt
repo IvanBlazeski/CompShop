@@ -34,10 +34,11 @@ class ProfileActivity : AppCompatActivity() {
     ) { success ->
         if (success) {
             cameraImageUri?.let { uri ->
-                val path = saveImageToInternalStorage(uri)
+                val uid = getUserId()
+                val path = saveImageToInternalStorage(uri, uid)
                 if (path != null) {
                     getSharedPreferences("settings", MODE_PRIVATE)
-                        .edit().putString("profile_image_path", path).apply()
+                        .edit().putString("profile_image_path_$uid", path).apply()
                     showProfileImage(path)
                     Toast.makeText(this, "Profile photo updated! 📷", Toast.LENGTH_SHORT).show()
                 }
@@ -54,10 +55,11 @@ class ProfileActivity : AppCompatActivity() {
                     it, Intent.FLAG_GRANT_READ_URI_PERMISSION
                 )
             } catch (e: Exception) { }
-            val path = saveImageToInternalStorage(it)
+            val uid = getUserId()
+            val path = saveImageToInternalStorage(it, uid)
             if (path != null) {
                 getSharedPreferences("settings", MODE_PRIVATE)
-                    .edit().putString("profile_image_path", path).apply()
+                    .edit().putString("profile_image_path_$uid", path).apply()
                 showProfileImage(path)
                 Toast.makeText(this, "Profile photo updated! 📷", Toast.LENGTH_SHORT).show()
             }
@@ -91,7 +93,7 @@ class ProfileActivity : AppCompatActivity() {
 
         // Вчитај зачувана слика веднаш
         val savedPath = getSharedPreferences("settings", MODE_PRIVATE)
-            .getString("profile_image_path", null)
+            .getString("profile_image_path_$userId", null)
         if (savedPath != null) {
             showProfileImage(savedPath)
         }
@@ -158,14 +160,15 @@ class ProfileActivity : AppCompatActivity() {
         binding.ivAvatar.imageTintList = null
     }
 
-    private fun saveImageToInternalStorage(uri: Uri): String? {
+    private fun saveImageToInternalStorage(uri: Uri, userId: String = ""): String? {
         return try {
             val inputStream = contentResolver.openInputStream(uri)
             if (inputStream == null) {
                 Toast.makeText(this, "Cannot open image", Toast.LENGTH_SHORT).show()
                 return null
             }
-            val file = java.io.File(filesDir, "profile_photo.jpg")
+            val fileName = if (userId.isNotEmpty()) "profile_${userId.hashCode()}.jpg" else "profile_photo.jpg"
+            val file = java.io.File(filesDir, fileName)
             val outputStream = java.io.FileOutputStream(file)
             inputStream.copyTo(outputStream)
             inputStream.close()
