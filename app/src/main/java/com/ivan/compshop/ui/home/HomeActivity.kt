@@ -37,6 +37,8 @@ class HomeActivity : AppCompatActivity() {
     private var globalUnreadCount = 0
     private var favoritedIds = mutableSetOf<String>()
 
+    private var showingFavorites = false
+
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
         binding = ActivityHomeBinding.inflate(layoutInflater)
@@ -101,8 +103,8 @@ class HomeActivity : AppCompatActivity() {
                     .mapNotNull { it.getString("brand") }
                     .distinct().sorted()
 
-                if (chipGroup.childCount > 1)
-                    chipGroup.removeViews(1, chipGroup.childCount - 1)
+                if (chipGroup.childCount > 2)
+                    chipGroup.removeViews(2, chipGroup.childCount - 2)
 
                 brands.forEach { brand ->
                     val chip = TextView(this)
@@ -130,6 +132,8 @@ class HomeActivity : AppCompatActivity() {
     }
 
     private fun selectBrandChip(chip: TextView) {
+        showingFavorites = false
+        binding.chipFavorites?.setBackgroundResource(R.drawable.btn_social_neon)
         selectedBrandChip?.setBackgroundResource(R.drawable.btn_social_neon)
         selectedBrandChip?.setTextColor(android.graphics.Color.parseColor("#00D4FF"))
         chip.setBackgroundResource(R.drawable.btn_neon_gradient)
@@ -143,9 +147,15 @@ class HomeActivity : AppCompatActivity() {
                 .show(supportFragmentManager, "NotificationsBottomSheet")
         }
 
-        binding.chipAll?.setOnLongClickListener {
-            showFavoritesDialog()
-            true
+        binding.chipFavorites?.setOnClickListener {
+            showingFavorites = true
+            selectedBrand = "All"
+            // Визуелно означи favorites chip
+            selectedBrandChip?.setBackgroundResource(R.drawable.btn_social_neon)
+            selectedBrandChip?.setTextColor(android.graphics.Color.parseColor("#00D4FF"))
+            binding.chipFavorites?.setBackgroundResource(R.drawable.btn_neon_gradient)
+            selectedBrandChip = null
+            applyFilters(getCurrentQuery())
         }
     }
 
@@ -299,6 +309,7 @@ class HomeActivity : AppCompatActivity() {
     private fun applyFilters(query: String) {
         var filtered = allComputers
 
+        // Search
         if (query.isNotEmpty()) {
             filtered = filtered.filter {
                 it.brand.contains(query, ignoreCase = true) ||
@@ -307,12 +318,19 @@ class HomeActivity : AppCompatActivity() {
             }
         }
 
+        // Brand chip
         if (selectedBrand != "All") {
             filtered = filtered.filter {
                 it.brand.contains(selectedBrand, ignoreCase = true)
             }
         }
 
+        // Favorites filter
+        if (showingFavorites) {
+            filtered = filtered.filter { favoritedIds.contains(it.id) }
+        }
+
+        // Processor filter
         if (!selectedProcessors.contains("All")) {
             filtered = filtered.filter { computer ->
                 selectedProcessors.any { proc ->
@@ -326,6 +344,7 @@ class HomeActivity : AppCompatActivity() {
             }
         }
 
+        // Price filter
         val priceFiltered = mutableListOf<Computer>()
         if (selectedPriceRanges.contains("All")) {
             priceFiltered.addAll(filtered)
@@ -339,6 +358,7 @@ class HomeActivity : AppCompatActivity() {
         }
         filtered = priceFiltered.distinctBy { it.id }
 
+        // Sort
         filtered = when (selectedSorts.firstOrNull()) {
             "Lowest price" -> filtered.sortedBy { it.price }
             "Highest price" -> filtered.sortedByDescending { it.price }
