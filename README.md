@@ -1,7 +1,7 @@
 # 🖥️ CompShop
 
 > Android e-commerce app for computers — Diploma Thesis Project  
-> Faculty of Information and Communication Technologies (FIKT), Prilep, Macedonia — 2026
+> Faculty of Information and Communication Technologies (FIKT), Bitola, Macedonia — 2026
 
 ---
 
@@ -139,11 +139,11 @@ A local HTML admin panel (`compshop-admin.html`) is included for:
 ## 👤 Author
 
 **Ivan Blazeski**  
-ICT Student — FIKT Prilep, Macedonia  
+ICT Student — FIKT Bitola, Macedonia  
 GitHub: [@IvanBlazeski](https://github.com/IvanBlazeski)
 
 ---
 
 ## 📄 License
 
-This project is developed for academic purposes as a diploma thesis at FIKT, Prilep.
+This project is developed for academic purposes as a diploma thesis at FIKT, Bitola.
