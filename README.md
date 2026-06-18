@@ -55,24 +55,27 @@
 
 ## 📸 Screenshots
 
+### Login
+![Login](screenshots/login.jpg)
+
 ### Home Screen
-![Home](screenshots/home.png)
+![Home](screenshots/home.jpg)
 
 ### Detail Screen
-![Detail](screenshots/detail.png)
+![Detail](screenshots/details.jpg)
 
-### Cart & Checkout
-![Cart](screenshots/cart.png)
+### Cart
+![Cart](screenshots/cart.jpg)
 
 ### Orders & Tracking
-![Orders](screenshots/orders.png)
+![Orders](screenshots/orders.jpg)
 
 ### Profile
-![Profile](screenshots/profile.png)
+![Profile 1](screenshots/profile1.jpg)
+![Profile 2](screenshots/profile2.jpg)
 
 ### Notifications
-![Notifications](screenshots/notifications.png)
-
+![Notifications](screenshots/notifications.jpg)
 ---
 
 ## 🗂️ Project Structure
