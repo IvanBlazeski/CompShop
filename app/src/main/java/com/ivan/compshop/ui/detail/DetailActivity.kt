@@ -1,5 +1,6 @@
 package com.ivan.compshop.ui.detail
 
+import android.content.Intent
 import android.os.Bundle
 import android.widget.Toast
 import androidx.appcompat.app.AppCompatActivity
@@ -76,7 +77,7 @@ class DetailActivity : AppCompatActivity() {
                         .into(binding.ivComputer)
                 }
 
-                // Favorites со Firestore
+                // Favorites
                 val userId = auth.currentUser?.let {
                     if (!it.email.isNullOrEmpty()) it.email else it.uid
                 } ?: ""
@@ -99,17 +100,14 @@ class DetailActivity : AppCompatActivity() {
                     binding.ivFavoriteDetail.setOnClickListener {
                         val favRef = firestore.collection("users").document(userId)
                             .collection("favorites").document(computer.id)
-                        if (isFavorite) {
-                            favRef.delete()
-                        } else {
-                            favRef.set(mapOf(
-                                "brand" to computer.brand,
-                                "model" to computer.model,
-                                "price" to computer.price,
-                                "imageUrl" to computer.imageUrl,
-                                "addedAt" to com.google.firebase.firestore.FieldValue.serverTimestamp()
-                            ))
-                        }
+                        if (isFavorite) favRef.delete()
+                        else favRef.set(mapOf(
+                            "brand" to computer.brand,
+                            "model" to computer.model,
+                            "price" to computer.price,
+                            "imageUrl" to computer.imageUrl,
+                            "addedAt" to com.google.firebase.firestore.FieldValue.serverTimestamp()
+                        ))
                     }
                 }
 
@@ -149,7 +147,21 @@ class DetailActivity : AppCompatActivity() {
                     }
                 }
 
+                // Add to Cart со Guest check
                 binding.btnAddToCart.setOnClickListener {
+                    if (auth.currentUser?.isAnonymous == true) {
+                        android.app.AlertDialog.Builder(this@DetailActivity)
+                            .setTitle("Login Required")
+                            .setMessage("You need to login or register to add items to cart.")
+                            .setPositiveButton("Login") { _, _ ->
+                                com.google.firebase.auth.FirebaseAuth.getInstance().signOut()
+                                finishAffinity()
+                                startActivity(android.content.Intent(this@DetailActivity, com.ivan.compshop.ui.auth.LoginActivity::class.java))
+                            }
+                            .setNegativeButton("Cancel", null)
+                            .show()
+                        return@setOnClickListener
+                    }
                     lifecycleScope.launch {
                         val cartItem = CartItem(
                             computerId = computer.id,

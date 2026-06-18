@@ -1,5 +1,6 @@
 package com.ivan.compshop.ui.cart
 
+import android.content.Intent
 import android.os.Bundle
 import android.view.View
 import android.widget.Toast
@@ -7,13 +8,12 @@ import androidx.appcompat.app.AppCompatActivity
 import androidx.lifecycle.lifecycleScope
 import androidx.recyclerview.widget.LinearLayoutManager
 import com.google.firebase.auth.FirebaseAuth
-import com.google.firebase.firestore.FieldValue
 import com.google.firebase.firestore.FirebaseFirestore
 import com.ivan.compshop.CompShopApplication
+import com.ivan.compshop.R
 import com.ivan.compshop.databinding.ActivityCartBinding
 import kotlinx.coroutines.flow.collectLatest
 import kotlinx.coroutines.launch
-import com.ivan.compshop.R
 
 class CartActivity : AppCompatActivity() {
 
@@ -73,6 +73,20 @@ class CartActivity : AppCompatActivity() {
 
     private fun setupCheckout() {
         binding.btnCheckout.setOnClickListener {
+            if (auth.currentUser?.isAnonymous == true) {
+                android.app.AlertDialog.Builder(this)
+                    .setTitle("Login Required")
+                    .setMessage("You need to login or register to place orders.")
+                    .setPositiveButton("Login") { _, _ ->
+                        com.google.firebase.auth.FirebaseAuth.getInstance().signOut()
+                        finishAffinity()
+                        startActivity(android.content.Intent(this@CartActivity, com.ivan.compshop.ui.auth.LoginActivity::class.java))
+                    }
+                    .setNegativeButton("Cancel", null)
+                    .show()
+                return@setOnClickListener
+            }
+
             lifecycleScope.launch {
                 val items = app.cartRepository.getAllItemsList()
                 val total = app.cartRepository.getTotalPriceOnce()
@@ -140,9 +154,7 @@ class CartActivity : AppCompatActivity() {
                 else
                     "Your order of $${"%.2f".format(finalTotal)} will be paid on delivery."
 
-                firestore.collection("users")
-                    .document(userId)
-                    .collection("notifications")
+                firestore.collection("users").document(userId).collection("notifications")
                     .add(hashMapOf(
                         "title" to notifTitle,
                         "message" to notifMessage,
@@ -150,15 +162,10 @@ class CartActivity : AppCompatActivity() {
                         "createdAt" to com.google.firebase.firestore.FieldValue.serverTimestamp()
                     ))
 
-                Toast.makeText(
-                    this@CartActivity,
-                    getString(R.string.order_placed),
-                    Toast.LENGTH_SHORT
-                ).show()
+                Toast.makeText(this@CartActivity, getString(R.string.order_placed), Toast.LENGTH_SHORT).show()
 
                 lifecycleScope.launch {
                     app.cartRepository.clearCart()
-                    // Намали залихата во Firestore
                     items.forEach { item ->
                         val computerRef = firestore.collection("computers").document(item.computerId)
                         firestore.runTransaction { transaction ->
@@ -177,4 +184,4 @@ class CartActivity : AppCompatActivity() {
                 Toast.makeText(this@CartActivity, "Error: ${e.message}", Toast.LENGTH_SHORT).show()
             }
     }
-}
+    }

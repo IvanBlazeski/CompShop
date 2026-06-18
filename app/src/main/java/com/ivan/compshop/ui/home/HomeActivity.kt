@@ -382,6 +382,10 @@ class HomeActivity : AppCompatActivity() {
     }
 
     private fun addToCart(computer: Computer) {
+        if (FirebaseAuth.getInstance().currentUser?.isAnonymous == true) {
+            showLoginDialog()
+            return
+        }
         if (!computer.inStock || computer.quantity <= 0) {
             Toast.makeText(this, "⛔ Out of Stock", Toast.LENGTH_SHORT).show()
             return
@@ -398,6 +402,19 @@ class HomeActivity : AppCompatActivity() {
             app.cartRepository.addToCart(cartItem)
             Toast.makeText(this@HomeActivity, getString(R.string.added_to_cart), Toast.LENGTH_SHORT).show()
         }
+    }
+
+    private fun showLoginDialog() {
+        android.app.AlertDialog.Builder(this)
+            .setTitle("Login Required")
+            .setMessage("You need to login or register to add items to cart.")
+            .setPositiveButton("Login") { _, _ ->
+                com.google.firebase.auth.FirebaseAuth.getInstance().signOut()
+                finishAffinity()
+                startActivity(android.content.Intent(this@HomeActivity, com.ivan.compshop.ui.auth.LoginActivity::class.java))
+            }
+            .setNegativeButton("Cancel", null)
+            .show()
     }
 
     private fun dpToPx(dp: Int): Int {
